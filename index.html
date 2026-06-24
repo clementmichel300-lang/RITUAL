@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚡ RITUEL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:#07071b;color:#e2e8f0;font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#7c3aed55;border-radius:2px}::-webkit-scrollbar-thumb:hover{background:#7c3aed}
+
+/* ── AUTH ──────────────────────────── */
+#auth{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9000;background:#07071b;overflow-y:auto}
+.auth-bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.auth-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18}
+.auth-box{position:relative;z-index:1;width:100%;max-width:420px;padding:20px 16px}
+.auth-logo{text-align:center;margin-bottom:32px}
+.auth-logo-icon{font-size:52px;margin-bottom:8px;display:block}
+.auth-logo-title{font-size:28px;font-weight:800;font-family:'Space Grotesk',sans-serif;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.auth-logo-sub{font-size:13px;color:#475569;margin-top:4px}
+.auth-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:28px 24px;backdrop-filter:blur(20px)}
+.auth-tabs{display:flex;gap:0;background:rgba(255,255,255,.04);border-radius:10px;padding:3px;margin-bottom:24px}
+.auth-tab{flex:1;padding:8px;border-radius:8px;border:none;background:none;color:#64748b;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.auth-tab.on{background:linear-gradient(135deg,#7c3aed,#0891b2);color:#fff}
+.auth-input-wrap{position:relative;margin-bottom:14px}
+.auth-input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;color:#475569;pointer-events:none}
+.auth-input{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#e2e8f0;border-radius:12px;padding:12px 14px 12px 40px;width:100%;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.auth-input:focus{border-color:rgba(124,58,237,.6);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+::placeholder{color:rgba(255,255,255,.18)}
+.auth-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#7c3aed,#0891b2);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px;transition:opacity .2s;position:relative;overflow:hidden}
+.auth-btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .2s}
+.auth-btn:hover::after{background:rgba(255,255,255,.08)}
+.auth-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:10px 14px;font-size:13px;color:#fca5a5;margin-bottom:12px;display:none}
+.auth-accounts{margin-top:20px}
+.auth-account-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);margin-bottom:6px;cursor:pointer;transition:border-color .2s}
+.auth-account-item:hover{border-color:rgba(124,58,237,.3)}
+.auth-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#0891b2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+
+/* ── LAYOUT ────────────────────────── */
+#app{display:none;min-height:100vh}
+
+/* Desktop sidebar */
+@media(min-width:768px){
+  #app{display:flex;flex-direction:row}
+  #sidebar{width:220px;min-width:220px;background:rgba(255,255,255,.02);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;padding:20px 12px;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto}
+  #main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
+  #topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(7,7,27,.9);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
+  #page{padding:28px 32px;flex:1}
+  #nav{display:none}
+  #mobile-header{display:none}
+}
+@media(max-width:767px){
+  #sidebar{display:none}
+  #main{flex:1;min-width:0}
+  #topbar{display:none}
+  #page{padding:14px 16px 80px}
+  #mobile-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(7,7,27,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);position:sticky;top:0;z-index:100}
+  #nav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,7,27,.97);backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.06);padding:6px 4px max(8px,env(safe-area-inset-bottom));z-index:100}
+}
+
+/* Sidebar styles */
+.sb-logo{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:20px}
+.sb-logo-icon{font-size:24px}
+.sb-logo-text{font-size:16px;font-weight:800;font-family:'Space Grotesk',sans-serif;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sb-nav{flex:1}
+.sb-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:none;background:transparent;color:#64748b;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;width:100%;margin-bottom:3px;transition:all .15s;text-align:left}
+.sb-btn:hover{background:rgba(255,255,255,.04);color:#94a3b8}
+.sb-btn.on{background:rgba(124,58,237,.15);color:#a78bfa;font-weight:600;border-left:3px solid #7c3aed;padding-left:9px}
+.sb-btn .sb-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sb-section{font-size:9px;color:#334155;text-transform:uppercase;letter-spacing:.12em;padding:12px 12px 5px;font-weight:700}
+.sb-user{margin-top:auto;padding-top:12px;border-top:1px solid rgba(255,255,255,.05)}
+.sb-user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03)}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#0891b2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:600;color:#e2e8f0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-user-email{font-size:10px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-logout{background:none;border:none;color:#475569;font-size:16px;cursor:pointer;flex-shrink:0;padding:4px;border-radius:6px;transition:color .2s}
+.sb-logout:hover{color:#ef4444}
+
+/* Topbar */
+.tb-title{font-size:16px;font-weight:700;font-family:'Space Grotesk',sans-serif;color:#e2e8f0}
+.tb-date{font-size:12px;color:#475569}
+.tb-xp{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2)}
+.tb-streak{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:10px;background:rgba(251,146,60,.07);border:1px solid rgba(251,146,60,.18)}
+.tb-right{display:flex;align-items:center;gap:8px}
+
+/* Mobile nav */
+.nav-row{display:flex;justify-content:space-around}
+.nbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 7px;border-radius:10px;border:none;cursor:pointer;background:transparent;font-family:'Inter',sans-serif}
+.nbtn.on{background:rgba(124,58,237,.18);outline:1px solid rgba(124,58,237,.3)}
+.nicon{font-size:17px;line-height:1}
+.nlbl{font-size:9px;color:#475569}
+.nbtn.on .nlbl{color:#a78bfa;font-weight:700}
+
+/* Cards & components */
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.gtext{background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.btn-p{background:linear-gradient(135deg,#7c3aed,#0891b2);border:none;border-radius:12px;padding:8px 16px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-d{background:rgba(239,68,68,.2);border:none;border-radius:12px;padding:8px 16px;color:#ef4444;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-full{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#7c3aed,#0891b2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px}
+.chip{display:inline-block;padding:5px 12px;border-radius:99px;font-size:12px;background:rgba(255,255,255,.06);color:#94a3b8;border:none;cursor:pointer;font-family:'Inter',sans-serif;margin:3px}
+.chip.on{background:linear-gradient(135deg,#7c3aed,#0891b2);color:#fff}
+input:not(.auth-input),textarea,select{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:#e2e8f0;border-radius:10px;padding:10px 13px;width:100%;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+input:not(.auth-input):focus,textarea:focus,select:focus{border-color:rgba(124,58,237,.55);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+input[type=range]{border:none!important;background:transparent!important;box-shadow:none!important;padding:8px 0!important;accent-color:#7c3aed}
+input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.4)}
+select option{background:#0f0f1a}
+.bar{background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.bar-f{background:linear-gradient(90deg,#7c3aed,#22d3ee);border-radius:99px;transition:width .5s}
+.hbtn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:transparent;border:1px solid transparent;cursor:pointer;text-align:left;width:100%;transition:all .15s;margin-bottom:6px;font-family:'Inter',sans-serif}
+.hbtn.done{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.3)}
+.hcheck{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.hbtn.done .hcheck{background:linear-gradient(135deg,#7c3aed,#22d3ee);border:none}
+.hlabel{font-size:14px;flex:1;color:#e2e8f0;transition:color .15s}
+.hbtn.done .hlabel{color:#64748b;text-decoration:line-through}
+.hxp{font-size:10px;padding:2px 7px;border-radius:99px;flex-shrink:0;background:rgba(255,255,255,.04);color:#334155}
+.hbtn.done .hxp{background:rgba(124,58,237,.15);color:#7c3aed}
+.lbl{font-size:11px;color:#64748b;display:block;margin-bottom:5px}
+.wdot{width:8px;height:8px;border-radius:50%;display:inline-block;margin:0 1px}
+
+/* Desktop grid helpers */
+@media(min-width:768px){
+  .desk-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .desk-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .card{border-radius:18px}
+}
+
+/* Toast */
+#toast{position:fixed;top:20px;right:24px;left:auto;transform:translateX(120%);background:linear-gradient(135deg,#7c3aed,#0891b2);padding:13px 22px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:9999;color:#fff;font-size:14px;font-weight:600;min-width:220px;text-align:center;transition:transform .35s cubic-bezier(.22,1,.36,1);pointer-events:none}
+#toast.show{transform:translateX(0)}
+@media(max-width:767px){
+  #toast{right:auto;left:50%;transform:translateX(-50%) translateY(-80px)}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+}
+
+/* Settings overlay */
+#soverlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;display:none;align-items:center;justify-content:center}
+#sbox{background:#0f0f1f;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:28px;width:100%;max-width:400px}
+
+/* Animations */
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.page-anim{animation:fu .25s both}
+@keyframes pg{0%,100%{box-shadow:0 0 20px rgba(124,58,237,.25)}50%{box-shadow:0 0 45px rgba(124,58,237,.55)}}
+.pglow{animation:pg 2.5s infinite}
+.ring-fill{transition:stroke-dashoffset .85s cubic-bezier(.4,0,.2,1)}
+@keyframes authIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.auth-box{animation:authIn .4s both}
+@keyframes orb1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+@keyframes orb2{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,15px)}}
+</style>
+</head>
+<body>
+
+<!-- ── AUTH SCREEN ──────────────────────────────────────────────────── -->
+<div id="auth">
+  <div class="auth-bg">
+    <div class="auth-orb" style="width:400px;height:400px;background:#7c3aed;top:-100px;left:-100px;animation:orb1 8s ease-in-out infinite"></div>
+    <div class="auth-orb" style="width:350px;height:350px;background:#0891b2;bottom:-80px;right:-80px;animation:orb2 10s ease-in-out infinite"></div>
+    <div class="auth-orb" style="width:200px;height:200px;background:#ec4899;top:50%;left:50%;margin:-100px;opacity:.1;animation:orb1 12s ease-in-out infinite reverse"></div>
+  </div>
+  <div class="auth-box">
+    <div class="auth-logo">
+      <span class="auth-logo-icon">⚡</span>
+      <div class="auth-logo-title">RITUEL</div>
+      <div class="auth-logo-sub">Ton système de performance quotidien</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab on" id="tab-login" onclick="switchAuthTab('login')">Se connecter</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Créer un compte</button>
+      </div>
+      <div id="auth-error" class="auth-error"></div>
+
+      <!-- Login form -->
+      <div id="form-login">
+        <div class="auth-input-wrap">
+          <span class="auth-input-icon">📧</span>
+          <input class="auth-input" id="login-email" type="email" placeholder="Adresse e-mail" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+        </div>
+        <div class="auth-input-wrap">
+          <span class="auth-input-icon">🔒</span>
+          <input class="auth-input" id="login-pass" type="password" placeholder="Mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="auth-btn" onclick="doLogin()">Connexion →</button>
+        <div id="saved-accounts" style="margin-top:20px"></div>
+      </div>
+
+      <!-- Signup form -->
+      <div id="form-signup" style="display:none">
+        <div class="auth-input-wrap">
+          <span class="auth-input-icon">👤</span>
+          <input class="auth-input" id="su-name" type="text" placeholder="Ton prénom / surnom" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('su-email').focus()">
+        </div>
+        <div class="auth-input-wrap">
+          <span class="auth-input-icon">📧</span>
+          <input class="auth-input" id="su-email" type="email" placeholder="Adresse e-mail" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('su-pass').focus()">
+        </div>
+        <div class="auth-input-wrap">
+          <span class="auth-input-icon">🔒</span>
+          <input class="auth-input" id="su-pass" type="password" placeholder="Mot de passe (min 6 caractères)" autocomplete="new-password" onkeydown="if(event.key==='Enter')document.getElementById('su-pass2').focus()">
+        </div>
+        <div class="auth-input-wrap">
+          <span class="auth-input-icon">🔒</span>
+          <input class="auth-input" id="su-pass2" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignup()">
+        </div>
+        <button class="auth-btn" onclick="doSignup()">Créer mon compte ⚡</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ──────────────────────────────────────────────────────── -->
+<div id="app">
+
+  <!-- Sidebar (desktop) -->
+  <aside id="sidebar">
+    <div class="sb-logo">
+      <span class="sb-logo-icon">⚡</span>
+      <span class="sb-logo-text">RITUEL</span>
+    </div>
+    <nav class="sb-nav" id="sb-nav"></nav>
+    <div class="sb-user" id="sb-user"></div>
+  </aside>
+
+  <!-- Main content -->
+  <div id="main">
+
+    <!-- Topbar (desktop) -->
+    <div id="topbar">
+      <div>
+        <div class="tb-title" id="tb-title">Dashboard</div>
+        <div class="tb-date" id="tb-date"></div>
+      </div>
+      <div class="tb-right">
+        <div class="tb-xp" id="tb-xp"></div>
+        <div class="tb-streak" id="tb-streak"></div>
+        <button onclick="toggleSettings()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:16px;color:#94a3b8">⚙️</button>
+      </div>
+    </div>
+
+    <!-- Mobile header -->
+    <div id="mobile-header">
+      <div style="font-size:15px;font-weight:700;font-family:'Space Grotesk',sans-serif;" class="gtext">⚡ RITUEL</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-size:12px;color:#a78bfa;font-weight:600" id="mob-xp"></div>
+        <button onclick="toggleSettings()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;width:32px;height:32px;cursor:pointer;font-size:14px;color:#94a3b8">⚙️</button>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div id="page"></div>
+
+    <!-- Mobile nav -->
+    <nav id="nav"><div class="nav-row" id="nav-row"></div></nav>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Settings overlay -->
+<div id="soverlay" onclick="closeSettings()">
+  <div id="sbox" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <span style="font-size:16px;font-weight:700;font-family:'Space Grotesk',sans-serif">⚙️ Paramètres</span>
+      <button onclick="closeSettings()" style="background:none;border:none;color:#64748b;font-size:22px;cursor:pointer">×</button>
+    </div>
+    <label class="lbl">Ton prénom / surnom</label>
+    <input id="s-name" style="margin-bottom:14px" placeholder="Champion">
+    <label class="lbl">Salle / semaine : <strong id="s-salle-lbl" style="color:#7c3aed">3×</strong></label>
+    <input type="range" id="s-salle" min="1" max="7" value="3" oninput="document.getElementById('s-salle-lbl').textContent=this.value+'×'" style="margin-bottom:12px">
+    <label class="lbl">CAP (course) / semaine : <strong id="s-cap-lbl" style="color:#22d3ee">2×</strong></label>
+    <input type="range" id="s-cap" min="1" max="7" value="2" oninput="document.getElementById('s-cap-lbl').textContent=this.value+'×'" style="margin-bottom:20px">
+    <button class="btn-full" onclick="saveSettings()">✅ Sauvegarder</button>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
+      <button onclick="doLogout()" style="width:100%;padding:12px;border-radius:12px;border:none;background:rgba(239,68,68,.1);color:#ef4444;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">🚪 Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ────────────────────────────────────────────────────────────
+
+const H=[
+  {id:'reveil',  l:'Réveil 7h30 — pas de snooze',          c:'Matin',   xp:15,i:'⏰'},
+  {id:'eau',     l:'500ml eau au lever',                     c:'Matin',   xp:8, i:'💧'},
+  {id:'dehors',  l:'20 min dehors + shadow boxing',          c:'Matin',   xp:20,i:'🥊'},
+  {id:'creme_m', l:'Crème acné matin',                      c:'Matin',   xp:8, i:'🧴'},
+  {id:'creatine',l:'Créatine 3g + protéines',               c:'Matin',   xp:10,i:'💊'},
+  {id:'todoist', l:'3 tâches Todoist planifiées',            c:'Matin',   xp:12,i:'📋'},
+  {id:'dw1',     l:'Deep Work #1 — 90 min',                 c:'Journée', xp:30,i:'💻'},
+  {id:'dw2',     l:'Deep Work #2 — 90 min',                 c:'Journée', xp:30,i:'💻'},
+  {id:'sport',   l:'Sport — salle / karaté / CAP / maison', c:'Journée', xp:25,i:'🏋️'},
+  {id:'etire',   l:'Étirements 10 min',                     c:'Journée', xp:10,i:'🧘'},
+  {id:'pc_off',  l:'PC éteint à 22h',                       c:'Soir',    xp:15,i:'🖥️'},
+  {id:'douche',  l:'Douche',                                 c:'Soir',    xp:8, i:'🚿'},
+  {id:'creme_s', l:'Crème acné soir',                       c:'Soir',    xp:8, i:'🧴'},
+  {id:'dump',    l:'Brain dump papier',                      c:'Soir',    xp:12,i:'📓'},
+  {id:'coucher', l:'Couché à 22h30',                        c:'Soir',    xp:20,i:'😴'},
+];
+
+const LV=[
+  // ── Tier 1 : Éveil (gris) ─────────────────────────────
+  {l:1, n:'Novice',          xp:0,     col:'#64748b'},
+  {l:2, n:'Éveillé',         xp:100,   col:'#64748b'},
+  {l:3, n:'Initiateur',      xp:250,   col:'#64748b'},
+  {l:4, n:'Chercheur',       xp:450,   col:'#64748b'},
+  {l:5, n:'Activé',          xp:700,   col:'#64748b'},
+  // ── Tier 2 : Fondation (vert) ──────────────────────────
+  {l:6, n:'Forgé',           xp:1000,  col:'#22c55e'},
+  {l:7, n:'Discipliné',      xp:1350,  col:'#22c55e'},
+  {l:8, n:'Entraîné',        xp:1750,  col:'#22c55e'},
+  {l:9, n:'Aguerri',         xp:2200,  col:'#22c55e'},
+  {l:10,n:'Endurci',         xp:2700,  col:'#22c55e'},
+  // ── Tier 3 : Momentum (bleu) ───────────────────────────
+  {l:11,n:'Lancé',           xp:3250,  col:'#3b82f6'},
+  {l:12,n:'Rythmé',          xp:3850,  col:'#3b82f6'},
+  {l:13,n:'Consistant',      xp:4500,  col:'#3b82f6'},
+  {l:14,n:'Focalisé',        xp:5200,  col:'#3b82f6'},
+  {l:15,n:'Déterminé',       xp:5950,  col:'#3b82f6'},
+  // ── Tier 4 : Compétiteur (violet) ─────────────────────
+  {l:16,n:'Challenger',      xp:6750,  col:'#8b5cf6'},
+  {l:17,n:'Ambitieux',       xp:7600,  col:'#8b5cf6'},
+  {l:18,n:'Battant',         xp:8500,  col:'#8b5cf6'},
+  {l:19,n:'Combattant',      xp:9450,  col:'#8b5cf6'},
+  {l:20,n:'Guerrier',        xp:10450, col:'#8b5cf6'},
+  // ── Tier 5 : Élite (or) ────────────────────────────────
+  {l:21,n:'Féroce',          xp:11500, col:'#f59e0b'},
+  {l:22,n:'Indomptable',     xp:12600, col:'#f59e0b'},
+  {l:23,n:'Conquérant',      xp:13750, col:'#f59e0b'},
+  {l:24,n:'Dominant',        xp:14950, col:'#f59e0b'},
+  {l:25,n:'Élite',           xp:16200, col:'#f59e0b'},
+  // ── Tier 6 : Maître (rouge) ────────────────────────────
+  {l:26,n:'Artisan d\'Élite',xp:17500, col:'#ef4444'},
+  {l:27,n:'Expert',          xp:18850, col:'#ef4444'},
+  {l:28,n:'Maître Artisan',  xp:20250, col:'#ef4444'},
+  {l:29,n:'Architecte',      xp:21700, col:'#ef4444'},
+  {l:30,n:'Stratège',        xp:23200, col:'#ef4444'},
+  // ── Tier 7 : Transcendant (rose) ──────────────────────
+  {l:31,n:'Visionnaire',     xp:24750, col:'#ec4899'},
+  {l:32,n:'Transcendant',    xp:26350, col:'#ec4899'},
+  {l:33,n:'Ascendant',       xp:28000, col:'#ec4899'},
+  {l:34,n:'Supérieur',       xp:29700, col:'#ec4899'},
+  {l:35,n:'Invincible',      xp:31450, col:'#ec4899'},
+  // ── Tier 8 : Légendaire (cyan) ─────────────────────────
+  {l:36,n:'Légendaire',      xp:33250, col:'#06b6d4'},
+  {l:37,n:'Mythique',        xp:35100, col:'#06b6d4'},
+  {l:38,n:'Titan',           xp:37000, col:'#06b6d4'},
+  {l:39,n:'Héros',           xp:38950, col:'#06b6d4'},
+  {l:40,n:'Demi-Dieu',       xp:40950, col:'#06b6d4'},
+  // ── Tier 9 : Immortel (violet profond) ────────────────
+  {l:41,n:'Immortel',        xp:43000, col:'#7c3aed'},
+  {l:42,n:'Divin',           xp:45100, col:'#7c3aed'},
+  {l:43,n:'Suprême',         xp:47250, col:'#7c3aed'},
+  {l:44,n:'Absolu',          xp:49450, col:'#7c3aed'},
+  {l:45,n:'Éternel',         xp:51700, col:'#7c3aed'},
+  // ── Tier 10 : APEX (or brillant) ──────────────────────
+  {l:46,n:'Omega',           xp:54000, col:'#fbbf24'},
+  {l:47,n:'Ultime',          xp:56350, col:'#fbbf24'},
+  {l:48,n:'Au-delà',         xp:58750, col:'#fbbf24'},
+  {l:49,n:'Transcendé',      xp:61200, col:'#fbbf24'},
+  {l:50,n:'⚡ APEX PREDATOR',xp:63700, col:'#fbbf24'},
+];
+
+const BG=[
+  {id:'b1',i:'⚡',n:'Démarrage',       d:'Première habitude cochée',    r:'common'},
+  {id:'b2',i:'⭐',n:'Jour Parfait',    d:'15/15 habitudes en 1 jour',   r:'rare'},
+  {id:'b3',i:'🔥',n:'On Fire',         d:'3 jours de streak',           r:'common'},
+  {id:'b4',i:'💎',n:'Sem. Légendaire', d:'7 jours consécutifs',         r:'epic'},
+  {id:'b5',i:'👑',n:'Invincible',      d:'30 jours consécutifs',        r:'legendary'},
+  {id:'b6',i:'📝',n:'Philosophe',      d:'Première review complétée',   r:'common'},
+  {id:'b7',i:'🧠',n:'Introspecteur',   d:'10 reviews complétées',       r:'rare'},
+  {id:'b8',i:'🥊',n:'Guerrier MMA',    d:'10 séances de sport',         r:'rare'},
+  {id:'b9',i:'💻',n:'Focus Absolu',    d:'20 Deep Works complétés',     r:'epic'},
+  {id:'ba',i:'📚',n:'Lecteur Pro',     d:'5 livres terminés',           r:'rare'},
+  {id:'bb',i:'🎯',n:'Architecte',      d:'5 objectifs créés',           r:'common'},
+  {id:'bc',i:'🚀',n:'Niveau 5',        d:'Champion atteint',            r:'epic'},
+  {id:'bd',i:'🌟',n:'APEX PREDATOR',   d:'Niveau 10 atteint',           r:'legendary'},
+  {id:'be',i:'🥋',n:'Futur MMA',       d:'Objectif MMA enregistré',     r:'special'},
+  {id:'bf',i:'🌅',n:'Lève-Tôt',        d:'Réveil 7h30 × 7 fois',       r:'rare'},
+  {id:'bg',i:'💰',n:'Entrepreneur',    d:'Objectif Business créé',      r:'special'},
+];
+
+const RC={common:'#64748b',rare:'#3b82f6',epic:'#8b5cf6',legendary:'#f59e0b',special:'#ec4899'};
+const CC={Scolaire:'#3b82f6',Sport:'#10b981',Business:'#f59e0b',Santé:'#ec4899',Personnel:'#8b5cf6',MMA:'#ef4444'};
+const CI={Scolaire:'📚',Sport:'💪',Business:'💰',Santé:'🧬',Personnel:'🧠',MMA:'🥊'};
+const ST=['Salle','Karaté','CAP','Shadow Boxing','Maison','Pompes/Tractions','Vélo','Natation','Autre'];
+const DF=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const MF=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const TABS=[
+  {id:'dash',icon:'🏠',label:'Dash',group:'principal'},
+  {id:'week',icon:'📅',label:'Semaine',group:'principal'},
+  {id:'sport',icon:'💪',label:'Sport',group:'principal'},
+  {id:'goals',icon:'🎯',label:'Objectifs',group:'principal'},
+  {id:'books',icon:'📚',label:'Lectures',group:'principal'},
+  {id:'review',icon:'📝',label:'Review',group:'perso'},
+  {id:'routine',icon:'⏱️',label:'Routine',group:'perso'},
+  {id:'stats',icon:'🏆',label:'Stats',group:'perso'},
+];
+
+// ── AUTH STATE ───────────────────────────────────────────────────────────
+
+let SESSION=null; // {email, name}
+let DATA=null;
+let TAB='dash';
+const FS={
+  sportOpen:false,sportType:'Salle',sportDur:'',sportInt:7,sportNotes:'',sportCustom:'',
+  goalOpen:false,goalTitle:'',goalCat:'Scolaire',goalDl:'',goalDesc:'',
+  bookOpen:false,bookTitle:'',bookAuthor:'',bookCat:'Business',bookStatus:'à_lire',
+  checkinOpen:false,
+};
+
+// ── AUTH STORAGE ──────────────────────────────────────────────────────────
+
+function getAccounts(){try{return JSON.parse(localStorage.getItem('rut-accounts')||'{}')}catch(e){return{}}}
+function saveAccounts(a){localStorage.setItem('rut-accounts',JSON.stringify(a))}
+function getSession(){try{return JSON.parse(localStorage.getItem('rut-session')||'null')}catch(e){return null}}
+function saveSession(s){if(s)localStorage.setItem('rut-session',JSON.stringify(s));else localStorage.removeItem('rut-session')}
+function getDataKey(email){return'rut-data-'+btoa(email.toLowerCase().trim())}
+function loadUserData(email){try{const r=localStorage.getItem(getDataKey(email));if(r)return JSON.parse(r)}catch(e){}
+  return{habits:{},reviews:{},sport:{sessions:[]},goals:[],books:[],badges:[],settings:{name:'Champion',salleGoal:3,capGoal:2}}}
+function saveUserData(){if(SESSION)localStorage.setItem(getDataKey(SESSION.email),JSON.stringify(DATA))}
+
+// ── AUTH LOGIC ────────────────────────────────────────────────────────────
+
+function hashPwd(p){
+  let h=0;for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0}
+  return Math.abs(h).toString(36);
+}
+
+function showAuthError(msg){
+  const el=document.getElementById('auth-error');
+  el.textContent=msg;el.style.display='block';
+  setTimeout(()=>el.style.display='none',4000);
+}
+
+function switchAuthTab(tab){
+  document.getElementById('form-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('form-signup').style.display=tab==='signup'?'block':'none';
+  document.getElementById('tab-login').classList.toggle('on',tab==='login');
+  document.getElementById('tab-signup').classList.toggle('on',tab==='signup');
+  document.getElementById('auth-error').style.display='none';
+}
+
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pass=document.getElementById('login-pass').value;
+  if(!email||!pass){showAuthError('Remplis tous les champs.');return}
+  const accounts=getAccounts();
+  if(!accounts[email]){showAuthError("Aucun compte avec cet e-mail.");return}
+  if(accounts[email].pwd!==hashPwd(pass)){showAuthError("Mot de passe incorrect.");return}
+  startSession({email,name:accounts[email].name});
+}
+
+function doSignup(){
+  const name=document.getElementById('su-name').value.trim();
+  const email=document.getElementById('su-email').value.trim().toLowerCase();
+  const pass=document.getElementById('su-pass').value;
+  const pass2=document.getElementById('su-pass2').value;
+  if(!name||!email||!pass||!pass2){showAuthError('Remplis tous les champs.');return}
+  if(pass.length<6){showAuthError('Mot de passe trop court (min 6 caractères).');return}
+  if(pass!==pass2){showAuthError('Les mots de passe ne correspondent pas.');return}
+  if(!/\S+@\S+\.\S+/.test(email)){showAuthError('E-mail invalide.');return}
+  const accounts=getAccounts();
+  if(accounts[email]){showAuthError('Un compte existe déjà avec cet e-mail.');return}
+  accounts[email]={name,pwd:hashPwd(pass),createdAt:new Date().toISOString()};
+  saveAccounts(accounts);
+  startSession({email,name});
+}
+
+function startSession(s){
+  SESSION=s;
+  saveSession(s);
+  DATA=loadUserData(s.email);
+  if(DATA.settings?.name&&DATA.settings.name!=='Champion')SESSION.name=DATA.settings.name;
+  else DATA.settings.name=s.name;
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='';
+  render();
+  renderSavedAccounts();
+}
+
+function doLogout(){
+  closeSettings();
+  SESSION=null;DATA=null;TAB='dash';
+  saveSession(null);
+  document.getElementById('auth').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pass').value='';
+  renderSavedAccounts();
+}
+
+function renderSavedAccounts(){
+  const accounts=getAccounts();
+  const keys=Object.keys(accounts);
+  const el=document.getElementById('saved-accounts');
+  if(!el)return;
+  if(keys.length===0){el.innerHTML='';return}
+  el.innerHTML=`<div style="font-size:11px;color:#334155;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Comptes existants</div>`+
+    keys.map(email=>{
+      const a=accounts[email];
+      const ini=(a.name||'?')[0].toUpperCase();
+      return`<div class="auth-account-item" onclick="quickLogin('${email.replace(/'/g,"\\'")}')">
+        <div class="auth-avatar">${ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e(a.name)}</div>
+          <div style="font-size:11px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e(email)}</div>
+        </div>
+        <span style="font-size:12px;color:#475569">→</span>
+      </div>`;
+    }).join('');
+}
+
+function quickLogin(email){
+  document.getElementById('login-email').value=email;
+  document.getElementById('login-pass').focus();
+}
+
+// ── UTILS ────────────────────────────────────────────────────────────────
+
+function gdk(d=new Date()){return d.toISOString().split('T')[0]}
+function todayFR(){const d=new Date();return DF[d.getDay()]+' '+d.getDate()+' '+MF[d.getMonth()]+' '+d.getFullYear()}
+function fmtDate(s){try{const d=new Date(s+'T12:00:00');return d.getDate()+' '+MF[d.getMonth()]}catch(e2){return s}}
+function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function save(){saveUserData()}
+function weekDates(){
+  const t=new Date(),day=t.getDay(),mon=new Date(t);
+  mon.setDate(t.getDate()-(day===0?6:day-1));
+  return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return gdk(d)});
+}
+
+// ── XP / STREAK / LEVEL ──────────────────────────────────────────────────
+
+function calcXP(){
+  let x=0;
+  Object.values(DATA.habits||{}).forEach(day=>{
+    const done=H.filter(h=>day[h.id]);
+    done.forEach(h=>x+=h.xp);
+    if(done.length===H.length)x+=75;
+  });
+  Object.values(DATA.reviews||{}).forEach(r=>{if(r&&r.victoire)x+=30});
+  (DATA.goals||[]).forEach(g=>{if(g.completed)x+=50});
+  (DATA.books||[]).forEach(b=>{if(b.status==='lu')x+=40});
+  return x;
+}
+
+function calcStreak(){
+  let s=0;const t=new Date();
+  for(let i=0;i<=365;i++){
+    const d=new Date(t);d.setDate(t.getDate()-i);
+    const k=gdk(d),day=DATA.habits[k]||{};
+    const done=H.filter(h=>day[h.id]).length;
+    if(done>=Math.ceil(H.length/2))s++;
+    else if(i===0)continue;
+    else break;
+  }
+  return s;
+}
+
+function getLI(xp){
+  let cur=LV[0],nxt=LV[1];
+  for(let i=LV.length-1;i>=0;i--){if(xp>=LV[i].xp){cur=LV[i];nxt=LV[i+1]||null;break}}
+  const inL=xp-cur.xp,need=nxt?nxt.xp-cur.xp:1;
+  return{cur,nxt,inL,need,pct:nxt?Math.min(100,(inL/need)*100):100};
+}
+
+function checkBadges(xp,streak){
+  const ub=new Set(DATA.badges||[]);
+  const h=DATA.habits||{};
+  const totalH=Object.values(h).reduce((s,d)=>s+H.filter(x=>d[x.id]).length,0);
+  const totalR=Object.values(DATA.reviews||{}).filter(r=>r&&r.victoire).length;
+  const perfD=Object.values(h).filter(d=>H.filter(x=>d[x.id]).length===H.length).length;
+  const sp=(DATA.sport?.sessions||[]).length;
+  const dw=Object.values(h).reduce((s,d)=>s+(d.dw1?1:0)+(d.dw2?1:0),0);
+  const bk=(DATA.books||[]).filter(b=>b.status==='lu').length;
+  const gl=(DATA.goals||[]).length;
+  const lv=getLI(xp).cur.l;
+  const rev=Object.values(h).filter(d=>d.reveil).length;
+  const hasMMA=(DATA.goals||[]).some(g=>g.title?.toLowerCase().includes('mma'));
+  const hasBiz=(DATA.goals||[]).some(g=>g.cat==='Business');
+  const cond={b1:totalH>=1,b2:perfD>=1,b3:streak>=3,b4:streak>=7,b5:streak>=30,
+    b6:totalR>=1,b7:totalR>=10,b8:sp>=10,b9:dw>=20,ba:bk>=5,bb:gl>=5,
+    bc:lv>=5,bd:lv>=10,be:hasMMA,bf:rev>=7,bg:hasBiz};
+  const unlocked=[];
+  BG.forEach(b=>{if(!ub.has(b.id)&&cond[b.id]){unlocked.push(b.id);ub.add(b.id)}});
+  if(unlocked.length){DATA.badges=[...ub];save();const bg=BG.find(b=>b.id===unlocked[0]);if(bg)toast('🏅 Badge débloqué : '+bg.n+' '+bg.i)}
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ── RING SVG ─────────────────────────────────────────────────────────────
+
+function ring(pct,size,sw,color){
+  const r=(size-sw)/2,c=2*Math.PI*r,off=c-(pct/100)*c;
+  return`<svg width="${size}" height="${size}" style="transform:rotate(-90deg);flex-shrink:0">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="rgba(255,255,255,.06)" stroke-width="${sw}" fill="none"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${sw}" fill="none"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round" class="ring-fill"/>
+  </svg>`;
+}
+
+// ── XP PANEL ─────────────────────────────────────────────────────────────
+
+function xpPanel(xp,li,streak){
+  return`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div>
+        <div style="font-size:10px;color:#64748b;letter-spacing:.1em;text-transform:uppercase">NIVEAU</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+          <span style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:${li.cur.col}">${li.cur.l}</span>
+          <span class="gtext" style="font-size:15px;font-weight:700;font-family:'Space Grotesk',sans-serif">${li.cur.n}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px">
+        <div style="text-align:center"><div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">XP</div><div style="font-size:16px;font-weight:700;color:#a78bfa">${xp.toLocaleString()}</div></div>
+        <div style="text-align:center"><div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">STREAK</div><div style="font-size:16px;font-weight:700;color:#fb923c">${streak}🔥</div></div>
+      </div>
+    </div>
+    <div class="bar" style="height:8px;margin-bottom:4px"><div class="bar-f" style="height:100%;width:${li.pct}%"></div></div>
+    ${li.nxt?`<div style="display:flex;justify-content:space-between;font-size:10px;color:#475569"><span>${li.inL.toLocaleString()} / ${li.need.toLocaleString()} XP</span><span>→ ${li.nxt.n} (${li.nxt.xp.toLocaleString()})</span></div>`:''}
+  </div>`;
+}
+
+// ── PAGE: DASHBOARD ───────────────────────────────────────────────────────
+
+function pageDash(){
+  const xp=calcXP(),streak=calcStreak(),li=getLI(xp);
+  const today=gdk(),dh=DATA.habits[today]||{};
+  const done=H.filter(h=>dh[h.id]).length,pct=(done/H.length)*100;
+  const pc=pct>=80?'#10b981':pct>=50?'#f59e0b':'#ef4444';
+  const cats=['Matin','Journée','Soir'],ci={Matin:'🌅',Journée:'☀️',Soir:'🌙'};
+  const perfect=done===H.length;
+
+  let habitsHTML='';
+  cats.forEach(cat=>{
+    const ch=H.filter(h=>h.c===cat),cd=ch.filter(h=>dh[h.id]).length;
+    habitsHTML+=`<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${ci[cat]}</span><span style="font-weight:600;font-size:13px">${cat}</span></div>
+      <span style="font-size:11px;color:#475569;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:99px">${cd}/${ch.length}</span></div>`;
+    ch.forEach(h=>{
+      const isDone=!!dh[h.id];
+      habitsHTML+=`<button class="hbtn${isDone?' done':''}" onclick="toggleHabit('${h.id}')">
+        <div class="hcheck">${isDone?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+        <span class="hlabel">${h.i} ${h.l}</span><span class="hxp">+${h.xp}</span></button>`;
+    });
+    habitsHTML+='</div>';
+  });
+
+  const isDesktop=window.innerWidth>=768;
+  if(isDesktop){
+    return`<div class="page-anim">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px">
+        <h2 style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#e2e8f0">Bonjour, ${e(DATA.settings?.name||SESSION?.name||'Champion')} 👋</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:18px;align-items:start">
+        <div>
+          ${xpPanel(xp,li,streak)}
+          <div class="card" style="display:flex;align-items:center;gap:16px">
+            <div style="position:relative;flex-shrink:0">${ring(pct,90,7,pc)}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-size:14px;font-weight:700;color:${pc}">${Math.round(pct)}%</span></div></div>
+            <div style="flex:1">
+              <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Habitudes du jour</div>
+              <div style="font-size:32px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#22d3ee;line-height:1.1">${done}<span style="font-size:17px;color:#475569">/${H.length}</span></div>
+              <div style="font-size:12px;color:${perfect?'#10b981':'#64748b'};margin-top:2px">${perfect?'🏆 Journée parfaite !':done===0?'Commence ta journée 💪':`${H.length-done} habitude${H.length-done>1?'s':''} restante${H.length-done>1?'s':''}`}</div>
+            </div>
+          </div>
+          ${perfect?`<div class="pglow" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:18px;padding:18px;text-align:center;margin-bottom:14px"><div style="font-size:36px;margin-bottom:6px">🏆</div><div style="font-weight:700;color:#fbbf24;font-size:16px;font-family:'Space Grotesk',sans-serif">JOURNÉE PARFAITE</div><div style="font-size:12px;color:#64748b;margin-top:4px">+75 XP bonus débloqué</div></div>`:''}
+        </div>
+        <div>${habitsHTML}</div>
+      </div>
+    </div>`;
+  }
+
+  return`<div class="page-anim">
+    <div style="text-align:center;padding:4px 0 10px">
+      <div style="font-size:11px;color:#475569;letter-spacing:.12em;text-transform:uppercase">${todayFR()}</div>
+      <h1 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-top:4px">Bonjour, ${e(DATA.settings?.name||SESSION?.name||'Champion')} !</h1>
+    </div>
+    ${xpPanel(xp,li,streak)}
+    <div class="card" style="display:flex;align-items:center;gap:12px">
+      <div style="position:relative;flex-shrink:0">${ring(pct,76,6,pc)}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-size:13px;font-weight:700;color:${pc}">${Math.round(pct)}%</span></div></div>
+      <div style="flex:1"><div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Habitudes du jour</div><div style="font-size:28px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#22d3ee;line-height:1.1">${done}<span style="font-size:15px;color:#475569">/${H.length}</span></div><div style="font-size:12px;color:${perfect?'#10b981':'#64748b'};margin-top:2px">${perfect?'🏆 Journée parfaite !':done===0?'Commence ta journée 💪':`${H.length-done} habitude${H.length-done>1?'s':''} restante${H.length-done>1?'s':''}`}</div></div>
+    </div>
+    ${habitsHTML}
+    ${perfect?`<div class="pglow" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:16px;padding:18px;text-align:center;margin-bottom:12px"><div style="font-size:32px;margin-bottom:6px">🏆</div><div style="font-weight:700;color:#fbbf24;font-size:15px;font-family:'Space Grotesk',sans-serif">JOURNÉE PARFAITE</div><div style="font-size:12px;color:#64748b;margin-top:4px">+75 XP bonus débloqué</div></div>`:''}
+  </div>`;
+}
+
+// ── PAGE: SEMAINE ─────────────────────────────────────────────────────────
+
+function pageWeek(){
+  const wd=weekDates(),today=gdk();
+  const salleGoal=DATA.settings?.salleGoal||3;
+  const capGoal=DATA.settings?.capGoal||2;
+  const weekSp=(DATA.sport?.sessions||[]).filter(s=>wd.includes(s.date));
+  const weekSalle=weekSp.filter(s=>s.type==='Salle');
+  const weekCap=weekSp.filter(s=>s.type==='CAP');
+  let dayGrid='';
+  wd.forEach(date=>{
+    const d=new Date(date+'T12:00:00'),dh=DATA.habits[date]||{};
+    const done=H.filter(h=>dh[h.id]).length,pct=Math.round((done/H.length)*100);
+    const isT=date===today,col=pct>=80?'#10b981':pct>=50?'#f59e0b':pct>0?'#ef4444':'#1e293b';
+    dayGrid+=`<div class="card" style="padding:10px 6px;text-align:center;margin-bottom:0;${isT?'border-color:rgba(124,58,237,.5)':''}">
+      <div style="font-size:9px;color:#475569;text-transform:uppercase">${DF[d.getDay()]}</div>
+      <div style="font-size:15px;font-weight:700;margin:4px 0;color:${isT?'#a78bfa':'#e2e8f0'}">${d.getDate()}</div>
+      <div style="font-size:11px;font-weight:600;color:${col}">${pct>0?pct+'%':'—'}</div>
+      <div style="margin-top:5px;height:3px;border-radius:99px;background:${col};opacity:${pct>0?1:.12}"></div>
+    </div>`;
+  });
+  let dotRows='';
+  H.forEach(h=>{
+    const cnt=wd.filter(d=>(DATA.habits[d]||{})[h.id]).length;
+    let dots='';
+    wd.forEach(d=>{const done=(DATA.habits[d]||{})[h.id];dots+=`<span class="wdot" style="background:${done?'#7c3aed':'rgba(255,255,255,.06)'};border:1px solid ${done?'#7c3aed':'rgba(255,255,255,.08)'}"></span>`;});
+    dotRows+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:#94a3b8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.i} ${h.l}</span><div style="flex-shrink:0">${dots}</div><span style="font-size:11px;color:#7c3aed;width:16px;text-align:right;flex-shrink:0">${cnt}</span></div>`;
+  });
+  const spRows=weekSp.map(s=>`<div style="display:flex;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.03);margin-top:5px;font-size:12px;color:#64748b"><span>${s.type==='Karaté'?'🥋':s.type==='CAP'?'🏃':s.type==='Salle'?'🏋️':'💪'}</span><span style="flex:1">${e(s.type)}</span><span>${s.dur} min</span><span style="color:${parseInt(s.int)>=8?'#ef4444':parseInt(s.int)>=6?'#f59e0b':'#10b981'}">${s.int}/10</span></div>`).join('');
+  return`<div class="page-anim">
+    <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-bottom:16px">Cette Semaine</h2>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px">${dayGrid}</div>
+    <div class="card"><div style="font-size:12px;color:#64748b;margin-bottom:10px;font-weight:600">Récap habitudes — 7 jours</div>${dotRows}</div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:10px">💪 Sport cette semaine</div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="color:#a78bfa">🏋️ Salle</span><span style="color:${weekSalle.length>=salleGoal?'#10b981':'#f59e0b'}">${weekSalle.length}/${salleGoal}</span></div>
+      <div style="display:flex;gap:5px;margin-bottom:10px">${Array.from({length:salleGoal},(_,i)=>`<div style="flex:1;height:5px;border-radius:99px;background:${i<weekSalle.length?'linear-gradient(90deg,#7c3aed,#a78bfa)':'rgba(255,255,255,.06)'}"></div>`).join('')}</div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="color:#22d3ee">🏃 CAP</span><span style="color:${weekCap.length>=capGoal?'#10b981':'#f59e0b'}">${weekCap.length}/${capGoal}</span></div>
+      <div style="display:flex;gap:5px;margin-bottom:8px">${Array.from({length:capGoal},(_,i)=>`<div style="flex:1;height:5px;border-radius:99px;background:${i<weekCap.length?'linear-gradient(90deg,#0891b2,#22d3ee)':'rgba(255,255,255,.06)'}"></div>`).join('')}</div>
+      ${spRows}
+    </div>
+  </div>`;
+}
+
+// ── PAGE: SPORT ───────────────────────────────────────────────────────────
+
+function pageSport(){
+  const sessions=DATA.sport?.sessions||[];
+  const wd=weekDates();
+  const salleGoal=DATA.settings?.salleGoal||3;
+  const capGoal=DATA.settings?.capGoal||2;
+  const wkSalle=sessions.filter(s=>wd.includes(s.date)&&s.type==='Salle');
+  const wkCap=sessions.filter(s=>wd.includes(s.date)&&s.type==='CAP');
+  const ic=n=>n>=8?'#ef4444':n>=6?'#f59e0b':'#10b981';
+  const typeChips=ST.map(t=>`<button class="chip${FS.sportType===t&&!FS.sportCustom?' on':''}" onclick="FS.sportType='${t}';FS.sportCustom='';render()">${t}</button>`).join('');
+  const form=FS.sportOpen?`<div class="card" style="border-color:rgba(124,58,237,.2);margin-bottom:14px">
+    <div style="font-size:13px;font-weight:600;color:#a78bfa;margin-bottom:12px">Nouvelle séance</div>
+    <label class="lbl">Date</label><input type="date" id="s-date" value="${gdk()}" style="margin-bottom:10px">
+    <label class="lbl">Type de sport</label><div style="margin-bottom:8px">${typeChips}</div>
+    <input placeholder="Autre sport..." id="s-custom" value="${e(FS.sportCustom)}" oninput="FS.sportCustom=this.value;FS.sportType=this.value" style="margin-bottom:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><label class="lbl">Durée (min)</label><input type="number" id="s-dur" placeholder="60" value="${e(FS.sportDur)}" oninput="FS.sportDur=this.value" min="1" max="360"></div>
+      <div><label class="lbl">Intensité : <strong id="int-lbl" style="color:${ic(FS.sportInt)}">${FS.sportInt}/10</strong></label><input type="range" id="s-int" min="1" max="10" value="${FS.sportInt}" style="accent-color:${ic(FS.sportInt)}" oninput="FS.sportInt=parseInt(this.value);document.getElementById('int-lbl').textContent=this.value+'/10'"></div>
+    </div>
+    <label class="lbl">Notes</label><textarea id="s-notes" placeholder="Comment ça s'est passé ?" rows="2" oninput="FS.sportNotes=this.value" style="margin-bottom:12px">${e(FS.sportNotes)}</textarea>
+    <button class="btn-full" onclick="addSport()">✅ Enregistrer la séance</button>
+  </div>`:'';
+  const list=sessions.length===0?`<div class="card" style="padding:24px;text-align:center;color:#475569;font-size:13px">Aucune séance. Commence aujourd'hui ! 🥊</div>`:
+    [...sessions].reverse().map(s=>`<div class="card" style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+      <span style="font-size:24px">${s.type==='Karaté'?'🥋':s.type==='CAP'?'🏃':s.type==='Salle'?'🏋️':s.type==='Shadow Boxing'?'🥊':'💪'}</span>
+      <div style="flex:1"><div style="font-weight:600;font-size:13px">${e(s.type)}</div><div style="font-size:11px;color:#475569;margin-top:2px">${fmtDate(s.date)} · ${s.dur} min</div>${s.notes?`<div style="font-size:11px;color:#374155;margin-top:2px;font-style:italic">${e(s.notes)}</div>`:''}</div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:${ic(parseInt(s.int))}">${s.int}</div><div style="font-size:10px;color:#475569">/10</div></div>
+      <button onclick="delSport(${s.id})" style="background:none;border:none;color:#334155;font-size:20px;cursor:pointer;padding:4px">×</button>
+    </div>`).join('');
+  return`<div class="page-anim">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif">Sport</h2>
+      <button class="${FS.sportOpen?'btn-d':'btn-p'}" onclick="FS.sportOpen=!FS.sportOpen;render()">${FS.sportOpen?'✕ Annuler':'+ Séance'}</button>
+    </div>
+    <div class="card">
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:#a78bfa">🏋️ Salle</span><span style="font-size:12px;color:${wkSalle.length>=salleGoal?'#10b981':'#f59e0b'}">${wkSalle.length}/${salleGoal}</span></div>
+        <div style="display:flex;gap:5px">${Array.from({length:salleGoal},(_,i)=>`<div style="flex:1;height:7px;border-radius:99px;background:${i<wkSalle.length?'linear-gradient(90deg,#7c3aed,#a78bfa)':'rgba(255,255,255,.06)'}"></div>`).join('')}</div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:#22d3ee">🏃 CAP</span><span style="font-size:12px;color:${wkCap.length>=capGoal?'#10b981':'#f59e0b'}">${wkCap.length}/${capGoal}</span></div>
+        <div style="display:flex;gap:5px">${Array.from({length:capGoal},(_,i)=>`<div style="flex:1;height:7px;border-radius:99px;background:${i<wkCap.length?'linear-gradient(90deg,#0891b2,#22d3ee)':'rgba(255,255,255,.06)'}"></div>`).join('')}</div>
+      </div>
+      ${wkSalle.length>=salleGoal&&wkCap.length>=capGoal?'<div style="font-size:12px;color:#10b981;text-align:center;margin-top:10px">🎉 Tous les objectifs de la semaine atteints !</div>':''}
+    </div>
+    ${form}
+    <div style="font-size:12px;color:#64748b;margin-bottom:8px">Historique — ${sessions.length} séance${sessions.length!==1?'s':''}</div>
+    ${list}
+  </div>`;
+}
+
+// ── PAGE: OBJECTIFS ───────────────────────────────────────────────────────
+
+function pageGoals(){
+  const goals=DATA.goals||[];
+  const active=goals.filter(g=>!g.completed),done=goals.filter(g=>g.completed);
+  const catChips=Object.keys(CC).map(c=>`<button class="chip${FS.goalCat===c?' on':''}" style="${FS.goalCat===c?'background:'+CC[c]:''}" onclick="FS.goalCat='${c}';render()">${CI[c]} ${c}</button>`).join('');
+  const form=FS.goalOpen?`<div class="card" style="border-color:rgba(124,58,237,.2);margin-bottom:14px">
+    <div style="font-size:13px;font-weight:600;color:#a78bfa;margin-bottom:12px">Nouvel objectif</div>
+    <input id="g-title" placeholder="Titre de l'objectif..." value="${e(FS.goalTitle)}" oninput="FS.goalTitle=this.value" style="margin-bottom:10px">
+    <label class="lbl">Catégorie</label><div style="margin-bottom:10px">${catChips}</div>
+    <label class="lbl">Date limite</label><input type="date" id="g-dl" value="${e(FS.goalDl)}" oninput="FS.goalDl=this.value" style="margin-bottom:10px">
+    <textarea id="g-desc" placeholder="Description..." rows="2" oninput="FS.goalDesc=this.value" style="margin-bottom:12px">${e(FS.goalDesc)}</textarea>
+    <button class="btn-full" onclick="addGoal()">✅ Ajouter l'objectif</button>
+  </div>`:'';
+  const activeHTML=active.map(g=>`<div class="card" style="margin-bottom:8px">
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
+      <button onclick="toggleGoal(${g.id})" style="width:22px;height:22px;border-radius:50%;border:2px solid #334155;background:none;cursor:pointer;flex-shrink:0;margin-top:1px"></button>
+      <div style="flex:1"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:600;font-size:13px">${e(g.title)}</span><span style="font-size:10px;padding:2px 8px;border-radius:99px;background:${CC[g.cat]||'#374151'};color:#fff">${CI[g.cat]||''} ${e(g.cat)}</span></div>${g.desc?`<div style="font-size:11px;color:#475569;margin-top:3px">${e(g.desc)}</div>`:''}${g.dl?`<div style="font-size:10px;color:#334155;margin-top:3px">🗓 ${fmtDate(g.dl)}</div>`:''}</div>
+      <button onclick="delGoal(${g.id})" style="background:none;border:none;color:#334155;font-size:20px;cursor:pointer;padding:2px">×</button>
+    </div>
+    <div><div style="display:flex;justify-content:space-between;font-size:11px;color:#475569;margin-bottom:4px"><span>Progression</span><span style="font-weight:600;color:${CC[g.cat]||'#7c3aed'}">${g.prog||0}%</span></div><input type="range" min="0" max="100" value="${g.prog||0}" style="accent-color:${CC[g.cat]||'#7c3aed'}" onchange="setGoalProg(${g.id},this.value)"><div class="bar" style="height:4px;margin-top:4px"><div style="height:100%;background:${CC[g.cat]||'#7c3aed'};border-radius:99px;width:${g.prog||0}%;transition:width .4s"></div></div></div>
+  </div>`).join('');
+  const doneHTML=done.map(g=>`<div class="card" style="display:flex;align-items:center;gap:10px;opacity:.55;margin-bottom:6px">
+    <button onclick="toggleGoal(${g.id})" style="width:22px;height:22px;border-radius:50%;background:#10b981;border:none;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <span style="flex:1;font-size:13px;text-decoration:line-through;color:#64748b">${e(g.title)}</span><span style="font-size:14px">${CI[g.cat]||''}</span>
+    <button onclick="delGoal(${g.id})" style="background:none;border:none;color:#334155;font-size:18px;cursor:pointer">×</button>
+  </div>`).join('');
+  return`<div class="page-anim">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif">Objectifs</h2>
+      <button class="${FS.goalOpen?'btn-d':'btn-p'}" onclick="FS.goalOpen=!FS.goalOpen;render()">${FS.goalOpen?'✕ Annuler':'+ Objectif'}</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">${[['Total',goals.length,'#22d3ee'],['En cours',active.length,'#f59e0b'],['Atteints',done.length,'#10b981']].map(([l,v,c])=>`<div class="card" style="padding:12px 8px;text-align:center;margin-bottom:0"><div style="font-size:24px;font-weight:700;color:${c};font-family:'Space Grotesk',sans-serif">${v}</div><div style="font-size:10px;color:#64748b">${l}</div></div>`).join('')}</div>
+    ${form}
+    ${active.length>0?`<div style="font-size:12px;color:#64748b;margin-bottom:8px">En cours (${active.length})</div>${activeHTML}`:''}
+    ${done.length>0?`<div style="font-size:12px;color:#64748b;margin-bottom:8px;margin-top:4px">Accomplis ✅</div>${doneHTML}`:''}
+    ${goals.length===0&&!FS.goalOpen?`<div class="card" style="padding:24px;text-align:center;color:#475569;font-size:13px">Aucun objectif. Commence par ton objectif MMA 🥊</div>`:''}
+  </div>`;
+}
+
+// ── PAGE: LECTURES ────────────────────────────────────────────────────────
+
+function pageBooks(){
+  const books=DATA.books||[];
+  const STATS=[{k:'à_lire',l:'À lire',i:'📋',c:'#64748b'},{k:'en_cours',l:'En cours',i:'📖',c:'#3b82f6'},{k:'lu',l:'Lu',i:'✅',c:'#10b981'},{k:'abandonné',l:'Abandonné',i:'❌',c:'#ef4444'}];
+  const BCATS=['Business','IA','Santé','Sport','Biographie','Roman','Développement','Finance'];
+  const read=books.filter(b=>b.status==='lu').length;
+  const catChips=BCATS.map(c=>`<button class="chip${FS.bookCat===c?' on':''}" onclick="FS.bookCat='${c}';render()">${c}</button>`).join('');
+  const statChips=STATS.map(s=>`<button class="chip${FS.bookStatus===s.k?' on':''}" style="${FS.bookStatus===s.k?'background:'+s.c:''}" onclick="FS.bookStatus='${s.k}';render()">${s.i} ${s.l}</button>`).join('');
+  const form=FS.bookOpen?`<div class="card" style="border-color:rgba(124,58,237,.2);margin-bottom:14px">
+    <div style="font-size:13px;font-weight:600;color:#a78bfa;margin-bottom:12px">Nouveau livre</div>
+    <input id="b-title" placeholder="Titre..." value="${e(FS.bookTitle)}" oninput="FS.bookTitle=this.value" style="margin-bottom:10px">
+    <input id="b-author" placeholder="Auteur..." value="${e(FS.bookAuthor)}" oninput="FS.bookAuthor=this.value" style="margin-bottom:10px">
+    <label class="lbl">Catégorie</label><div style="margin-bottom:10px">${catChips}</div>
+    <label class="lbl">Statut</label><div style="margin-bottom:12px">${statChips}</div>
+    <button class="btn-full" onclick="addBook()">✅ Ajouter le livre</button>
+  </div>`:'';
+  let booksHTML='';
+  STATS.forEach(s=>{
+    const grp=books.filter(b=>b.status===s.k);if(!grp.length)return;
+    booksHTML+=`<div style="font-size:12px;font-weight:600;color:${s.c};margin-bottom:8px">${s.i} ${s.l} (${grp.length})</div>`;
+    grp.forEach(b=>{
+      const stars=b.status==='lu'?`<div style="display:flex;gap:1px">${[1,2,3,4,5].map(i=>`<button onclick="rateBook(${b.id},${i})" style="background:none;border:none;font-size:16px;cursor:pointer;color:${i<=(b.rating||0)?'#f59e0b':'#1e293b'};padding:1px">★</button>`).join('')}</div>`:'';
+      booksHTML+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;gap:10px"><div style="flex:1"><div style="font-weight:600;font-size:13px">${e(b.title)}</div>${b.author?`<div style="font-size:11px;color:#64748b">${e(b.author)}</div>`:''}<div style="display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap"><span style="font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.06);color:#64748b">${e(b.cat)}</span><select onchange="updateBook(${b.id},'status',this.value)" style="width:auto;padding:2px 8px;font-size:11px;cursor:pointer">${STATS.map(st=>`<option value="${st.k}"${b.status===st.k?' selected':''}>${st.l}</option>`).join('')}</select></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">${stars}<button onclick="delBook(${b.id})" style="background:none;border:none;color:#334155;font-size:18px;cursor:pointer">×</button></div></div></div>`;
+    });
+  });
+  return`<div class="page-anim">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif">Lectures</h2>
+      <button class="${FS.bookOpen?'btn-d':'btn-p'}" onclick="FS.bookOpen=!FS.bookOpen;render()">${FS.bookOpen?'✕ Annuler':'+ Livre'}</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">${STATS.map(s=>`<div class="card" style="padding:10px 4px;text-align:center;margin-bottom:0"><div style="font-size:18px">${s.i}</div><div style="font-size:20px;font-weight:700;color:${s.c}">${books.filter(b=>b.status===s.k).length}</div><div style="font-size:9px;color:#475569">${s.l}</div></div>`).join('')}</div>
+    ${read>0?`<div class="card" style="display:flex;align-items:center;gap:10px;border-color:rgba(16,185,129,.2);background:rgba(16,185,129,.05);margin-bottom:14px"><span style="font-size:22px">🏆</span><div><div style="font-weight:600;color:#10b981;font-size:13px">${read} livre${read>1?'s':''} terminé${read>1?'s':''}</div><div style="font-size:11px;color:#64748b">+${read*40} XP gagnés</div></div></div>`:''}
+    ${form}${booksHTML}
+    ${books.length===0&&!FS.bookOpen?`<div class="card" style="padding:24px;text-align:center;color:#475569;font-size:13px">Aucun livre. Start reading ! 📚</div>`:''}
+  </div>`;
+}
+
+// ── PAGE: REVIEW ──────────────────────────────────────────────────────────
+
+function pageReview(){
+  const today=gdk(),ex=DATA.reviews?.[today]||{};
+  if(!DATA._rv||DATA._rv._date!==today){DATA._rv={coucher:'',reveil:'',energie:'7',dw1_fait:'',dw2_fait:'',dw1_dem:'',dw2_dem:'',victoire:'',blocage:'',ameliorer:'',...ex,_date:today}}
+  const r=DATA._rv;
+  const ec=n=>n>=8?'#10b981':n>=5?'#f59e0b':'#ef4444';
+  const en=parseInt(r.energie||7);
+  const genCheckin=()=>{
+    const dh=DATA.habits[today]||{},xp=calcXP(),streak=calcStreak();
+    return`📊 CHECK-IN DU ${todayFR().toUpperCase()}\n\n🔥 Streak : ${streak} jour${streak>1?'s':''}\n⚡ XP : ${xp.toLocaleString()}\n\n✅ HABITUDES (${H.filter(h=>dh[h.id]).length}/${H.length})\n${H.map(h=>`${dh[h.id]?'✅':'❌'} ${h.l}`).join('\n')}\n\n😴 Coucher : ${r.coucher||'—'} | Réveil : ${r.reveil||'—'}\n⚡ Énergie : ${r.energie}/10\n\n💻 DW1 : ${r.dw1_fait||'—'}\n💻 DW2 : ${r.dw2_fait||'—'}\n📅 DW1 demain : ${r.dw1_dem||'—'}\n📅 DW2 demain : ${r.dw2_dem||'—'}\n\n🏆 Victoire : ${r.victoire||'—'}\n🚧 Blocage : ${r.blocage||'—'}\n📈 À améliorer : ${r.ameliorer||'—'}`;
+  };
+  return`<div class="page-anim">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif">Review du Jour</h2>
+      <div style="font-size:11px;color:#475569">${todayFR()}</div>
+    </div>
+    <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:10px">⚡ Niveau d'énergie</div><div style="display:flex;justify-content:space-between;font-size:11px;color:#475569;margin-bottom:4px"><span>Mort 💀</span><span>Normal 😐</span><span>En feu 🔥</span></div><input type="range" min="1" max="10" value="${en}" style="accent-color:${ec(en)}" oninput="DATA._rv.energie=this.value;document.getElementById('en-val').textContent=this.value+'/10'"><div style="text-align:center;margin-top:4px"><span id="en-val" style="font-size:28px;font-weight:800;color:${ec(en)};font-family:'Space Grotesk',sans-serif">${en}/10</span></div></div>
+    <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:10px">😴 Sommeil</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label class="lbl">Coucher hier</label><input type="time" value="${r.coucher||''}" oninput="DATA._rv.coucher=this.value"></div><div><label class="lbl">Réveil</label><input type="time" value="${r.reveil||''}" oninput="DATA._rv.reveil=this.value"></div></div></div>
+    <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:10px">💻 Deep Work</div><label class="lbl">DW #1 — ce que j'ai fait</label><textarea rows="2" oninput="DATA._rv.dw1_fait=this.value" placeholder="Ex: Formation Make.com..." style="margin-bottom:10px">${e(r.dw1_fait||'')}</textarea><label class="lbl">DW #2 — ce que j'ai fait</label><textarea rows="2" oninput="DATA._rv.dw2_fait=this.value" placeholder="Ex: Veille IA..." style="margin-bottom:10px">${e(r.dw2_fait||'')}</textarea><div style="border-top:1px solid rgba(255,255,255,.06);padding-top:10px"><div style="font-size:11px;color:#7c3aed;font-weight:600;margin-bottom:8px">📅 Prévu pour demain</div><input placeholder="DW #1 demain..." value="${e(r.dw1_dem||'')}" oninput="DATA._rv.dw1_dem=this.value" style="margin-bottom:8px"><input placeholder="DW #2 demain..." value="${e(r.dw2_dem||'')}" oninput="DATA._rv.dw2_dem=this.value"></div></div>
+    <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:10px">🪞 Réflexion</div><label class="lbl">🏆 Victoire du jour</label><textarea rows="2" oninput="DATA._rv.victoire=this.value" placeholder="Quelle est ta plus grande victoire ?" style="margin-bottom:10px">${e(r.victoire||'')}</textarea><label class="lbl">🚧 Blocage rencontré</label><textarea rows="2" oninput="DATA._rv.blocage=this.value" placeholder="Qu'est-ce qui t'a bloqué ?" style="margin-bottom:10px">${e(r.blocage||'')}</textarea><label class="lbl">📈 1 chose à améliorer</label><textarea rows="2" oninput="DATA._rv.ameliorer=this.value" placeholder="Qu'est-ce que tu vas améliorer demain ?">${e(r.ameliorer||'')}</textarea></div>
+    <button class="btn-full" id="save-btn" onclick="saveReview()" style="margin-bottom:12px">💾 Sauvegarder la review</button>
+    <div class="card"><button onclick="FS.checkinOpen=!FS.checkinOpen;render()" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:13px;font-weight:600;font-family:'Inter',sans-serif"><span>🤖 Générer check-in pour Claude</span><span>${FS.checkinOpen?'▲':'▼'}</span></button>${FS.checkinOpen?`<div style="margin-top:12px"><pre id="checkin-pre" style="font-size:11px;color:#64748b;background:rgba(0,0,0,.3);padding:12px;border-radius:10px;line-height:1.6;max-height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace">${e(genCheckin())}</pre><button id="copy-btn" onclick="copyCheckin()" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(124,58,237,.25);background:rgba(124,58,237,.08);color:#a78bfa;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">📋 Copier dans le presse-papier</button></div>`:''}
+    </div>
+  </div>`;
+}
+
+// ── PAGE: ROUTINE ─────────────────────────────────────────────────────────
+
+function pageRoutine(){
+  const SCH=[
+    {t:'7h30',a:'Réveil FIXE ⏰',c:'#ef4444'},{t:'7h30–35',a:'500ml eau + fenêtre 💧',c:'#3b82f6'},
+    {t:'7h35–50',a:'Hygiène + crème acné matin 🧴',c:'#ec4899'},{t:'7h50–8h10',a:'Créatine 3g + crêpe protéinée 🥞',c:'#ec4899'},
+    {t:'8h10–30',a:'20 min dehors + shadow boxing 2 rounds 🥊',c:'#10b981'},{t:'8h30–40',a:'Todoist : 3 tâches + planifier DW 📋',c:'#3b82f6'},
+    {t:'8h40–10h10',a:'Deep Work #1 — 90 min 💻',c:'#3b82f6'},{t:'10h10–25',a:'Pause active ☕',c:'#475569'},
+    {t:'10h25–12h',a:'Deep Work #2 — 90 min 💻',c:'#3b82f6'},{t:'12h–13h',a:'Déjeuner famille 🍽️',c:'#475569'},
+    {t:'13h–14h',a:'Marche 15 min 🚶',c:'#10b981'},{t:'14h–17h',a:'Sport 🏋️',c:'#10b981'},
+    {t:'17h–19h',a:'Formation IA / Projet (2h max) 🤖',c:'#3b82f6'},{t:'19h–20h',a:'Dîner famille 🍽️',c:'#475569'},
+    {t:'20h–22h',a:'Review + Todoist demain 📝',c:'#3b82f6'},{t:'22h00',a:'PC ÉTEINT ⛔',c:'#ef4444'},
+    {t:'22h–10',a:'Douche 🚿',c:'#ec4899'},{t:'22h10–20',a:'Crème acné soir 🧴',c:'#ec4899'},
+    {t:'22h20–28',a:'Brain dump papier 📓',c:'#3b82f6'},{t:'22h28–30',a:'Chapelet 📿',c:'#ec4899'},
+    {t:'22h30',a:'Extinction — dormir 😴',c:'#ef4444'},
+  ];
+  return`<div class="page-anim">
+    <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-bottom:16px">Routine & Règles</h2>
+    <div class="card" style="border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.04)"><div style="font-size:13px;font-weight:700;color:#ef4444;margin-bottom:10px">⚡ RÈGLES NON-NÉGOCIABLES</div>${['⏰ Réveil fixe 7h30 — même couché à 2h','🖥️ PC éteint à 22h00','✅ 3 tâches Todoist max — complète d\'abord','💪 Sport avant réseaux sociaux','🏋️ Salle 3×/sem + CAP 2×/sem — no excuse'].map((r,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:9px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.1);margin-bottom:5px;font-size:13px"><span style="color:#ef4444;font-weight:700;width:18px;flex-shrink:0">${i+1}.</span><span style="color:#e2e8f0">${r}</span></div>`).join('')}</div>
+    <div class="card" style="border-color:rgba(16,185,129,.15)"><div style="font-size:13px;font-weight:700;color:#10b981;margin-bottom:10px">🗓️ Planning Sport</div>${[{d:'Mardi',t:'18h15',s:'CAP 🏃',n:'Selon dispo'},{d:'Jeudi',t:'18h15',s:'CAP 🏃'},{d:'Vendredi',t:'18h30',s:'Karaté 🥋',n:'Départ 17h25'},{d:'Quotidien',t:'Matin',s:'Shadow boxing + étirements 🥊'},{d:'Salle',t:'À fixer',s:'Musculation 🏋️',n:'Avec parents'}].map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:9px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.08);margin-bottom:5px"><div style="flex:1"><div style="font-size:12px;font-weight:600;color:#10b981">${s.d} <span style="color:#475569;font-weight:400">· ${s.t}</span></div><div style="font-size:11px;color:#94a3b8">${s.s}${s.n?' · '+s.n:''}</div></div></div>`).join('')}</div>
+    <div class="card"><div style="font-size:13px;font-weight:700;color:#22d3ee;margin-bottom:10px">⏱️ Programme Journalier</div>${SCH.map(item=>`<div style="display:flex;align-items:center;gap:10px;padding:5px 6px;border-radius:8px"><span style="font-size:10px;color:#475569;width:64px;flex-shrink:0;font-family:monospace">${item.t}</span><div style="width:3px;height:20px;border-radius:99px;background:${item.c};flex-shrink:0"></div><span style="font-size:12px;color:#94a3b8">${item.a}</span></div>`).join('')}</div>
+    <div class="card" style="border-color:rgba(124,58,237,.15)"><div style="font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:10px">😴 Reset Sommeil</div>${[['J1–J3','22h30','8h00'],['J4–J6','22h15','7h45'],['J7+','22h00','7h30']].map(([p,c,r])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:9px;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.12);margin-bottom:5px"><span style="font-size:13px;font-weight:600;color:#a78bfa">${p}</span><div style="display:flex;gap:16px;font-size:12px;color:#64748b"><span>🌙 ${c}</span><span>🌅 ${r}</span></div></div>`).join('')}</div>
+  </div>`;
+}
+
+// ── PAGE: STATS ───────────────────────────────────────────────────────────
+
+function pageStats(){
+  const xp=calcXP(),streak=calcStreak(),li=getLI(xp);
+  const ub=DATA.badges||[];
+  const h=DATA.habits||{};
+  const totalH=Object.values(h).reduce((s,d)=>s+H.filter(x=>d[x.id]).length,0);
+  const totalR=Object.values(DATA.reviews||{}).filter(r=>r&&r.victoire).length;
+  const sport=(DATA.sport?.sessions||[]).length;
+  const bks=(DATA.books||[]).filter(b=>b.status==='lu').length;
+  const bdgHTML=BG.map(b=>{
+    const ok=ub.includes(b.id),rc=RC[b.r];
+    return`<div class="card" style="padding:12px 6px;text-align:center;margin-bottom:0;${ok?'border-color:'+rc+'33;box-shadow:0 0 16px '+rc+'15':'opacity:.3;filter:grayscale(1)'}"><div style="font-size:26px;margin-bottom:4px">${b.i}</div><div style="font-size:10px;font-weight:600;color:#e2e8f0;line-height:1.3">${b.n}</div><div style="font-size:9px;color:#475569;margin-top:2px;line-height:1.3">${b.d}</div>${ok?`<div style="font-size:9px;font-weight:700;margin-top:4px;color:${rc};text-transform:uppercase">${b.r}</div>`:''}</div>`;
+  }).join('');
+  return`<div class="page-anim">
+    <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-bottom:16px">Stats & Badges</h2>
+    ${xpPanel(xp,li,streak)}
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">${[['🔥 Streak',streak+' j','#fb923c'],['✅ Habitudes',totalH.toLocaleString(),'#10b981'],['📝 Reviews',totalR,'#3b82f6'],['💪 Sport',sport,'#8b5cf6'],['📚 Lus',bks,'#f59e0b'],['🏅 Badges',ub.length+'/'+BG.length,'#ec4899']].map(([l,v,c])=>`<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:0"><div><div style="font-size:20px;font-weight:700;color:${c};font-family:'Space Grotesk',sans-serif">${v}</div><div style="font-size:10px;color:#64748b;margin-top:2px">${l}</div></div></div>`).join('')}</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:10px">Badges (${ub.length}/${BG.length})</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">${bdgHTML}</div>
+    <div class="card"><div style="font-size:12px;color:#64748b;margin-bottom:10px">🗺️ Roadmap Niveaux</div>${LV.map(lvl=>{const reached=xp>=lvl.xp,isC=li.cur.l===lvl.l;return`<div style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px;background:${isC?'rgba(255,255,255,.04)':'transparent'};border:${isC?'1px solid rgba(124,58,237,.25)':'1px solid transparent'};margin-bottom:4px"><div style="width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'Space Grotesk',sans-serif;background:${reached?lvl.col:'rgba(255,255,255,.04)'};color:${reached?'#000':'#475569'};opacity:${reached?1:.4}">${lvl.l}</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:${reached?lvl.col:'#475569'}">${lvl.n}${isC?' ← ici':''}</div><div style="font-size:10px;color:#334155">${lvl.xp.toLocaleString()} XP</div></div>${reached?'<span style="font-size:14px">✅</span>':''}</div>`;}).join('')}</div>
+  </div>`;
+}
+
+// ── COPY CHECKIN ──────────────────────────────────────────────────────────
+
+function copyCheckin(){
+  const pre=document.getElementById('checkin-pre');
+  const btn=document.getElementById('copy-btn');
+  if(!pre)return;
+  const text=pre.innerText||pre.textContent||'';
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      if(btn){btn.textContent='✅ Copié !';btn.style.color='#10b981';setTimeout(()=>{btn.textContent='📋 Copier dans le presse-papier';btn.style.color='#a78bfa'},2000)}
+    }).catch(()=>fallbackCopy(text,btn));
+  } else {fallbackCopy(text,btn)}
+}
+function fallbackCopy(text,btn){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');if(btn){btn.textContent='✅ Copié !';btn.style.color='#10b981';setTimeout(()=>{btn.textContent='📋 Copier dans le presse-papier';btn.style.color='#a78bfa'},2000)}}catch(e){}
+  document.body.removeChild(ta);
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────
+
+function toggleHabit(id){
+  const today=gdk();if(!DATA.habits[today])DATA.habits[today]={};
+  DATA.habits[today][id]=!DATA.habits[today][id];
+  save();const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render();
+}
+function addSport(){
+  const dur=document.getElementById('s-dur')?.value||FS.sportDur;if(!dur)return;
+  const date=document.getElementById('s-date')?.value||gdk();
+  const type=FS.sportCustom||FS.sportType;
+  const int=document.getElementById('s-int')?.value||FS.sportInt;
+  const notes=document.getElementById('s-notes')?.value||FS.sportNotes;
+  if(!DATA.sport)DATA.sport={sessions:[]};
+  DATA.sport.sessions.push({id:Date.now(),date,type,dur,int,notes});
+  save();FS.sportOpen=false;FS.sportDur='';FS.sportNotes='';FS.sportCustom='';
+  const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render();
+}
+function delSport(id){DATA.sport.sessions=DATA.sport.sessions.filter(s=>s.id!==id);save();render()}
+function addGoal(){
+  const title=document.getElementById('g-title')?.value||FS.goalTitle;if(!title)return;
+  const dl=document.getElementById('g-dl')?.value||FS.goalDl;
+  const desc=document.getElementById('g-desc')?.value||FS.goalDesc;
+  if(!DATA.goals)DATA.goals=[];
+  DATA.goals.push({id:Date.now(),title,cat:FS.goalCat,dl,desc,completed:false,prog:0,createdAt:gdk()});
+  save();FS.goalOpen=false;FS.goalTitle='';FS.goalDl='';FS.goalDesc='';
+  const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render();
+}
+function toggleGoal(id){const g=DATA.goals.find(x=>x.id===id);if(!g)return;g.completed=!g.completed;save();const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render()}
+function delGoal(id){DATA.goals=DATA.goals.filter(x=>x.id!==id);save();render()}
+function setGoalProg(id,v){const g=DATA.goals.find(x=>x.id===id);if(!g)return;g.prog=+v;save()}
+function addBook(){
+  const title=document.getElementById('b-title')?.value||FS.bookTitle;if(!title)return;
+  const author=document.getElementById('b-author')?.value||FS.bookAuthor;
+  if(!DATA.books)DATA.books=[];
+  DATA.books.push({id:Date.now(),title,author,cat:FS.bookCat,status:FS.bookStatus,rating:0,addedAt:gdk()});
+  save();FS.bookOpen=false;FS.bookTitle='';FS.bookAuthor='';
+  const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render();
+}
+function updateBook(id,key,val){const b=DATA.books.find(x=>x.id===id);if(!b)return;b[key]=val;save();const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render()}
+function rateBook(id,n){updateBook(id,'rating',n)}
+function delBook(id){DATA.books=DATA.books.filter(x=>x.id!==id);save();render()}
+function saveReview(){
+  const today=gdk(),r=DATA._rv||{};
+  if(!DATA.reviews)DATA.reviews={};
+  DATA.reviews[today]={...r,savedAt:new Date().toISOString()};
+  save();toast('📝 Review sauvegardée ! +30 XP');
+  const btn=document.getElementById('save-btn');
+  if(btn){btn.textContent='✅ Review sauvegardée !';btn.style.background='linear-gradient(135deg,#10b981,#059669)';setTimeout(()=>{if(btn){btn.textContent='💾 Sauvegarder la review';btn.style.background=''}},2500)}
+  const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────
+
+function toggleSettings(){
+  document.getElementById('soverlay').style.display='flex';
+  const s=DATA.settings||{};
+  document.getElementById('s-name').value=s.name||SESSION?.name||'Champion';
+  const sg=s.salleGoal||3,cg=s.capGoal||2;
+  document.getElementById('s-salle').value=sg;
+  document.getElementById('s-salle-lbl').textContent=sg+'×';
+  document.getElementById('s-cap').value=cg;
+  document.getElementById('s-cap-lbl').textContent=cg+'×';
+}
+function closeSettings(){document.getElementById('soverlay').style.display='none'}
+function saveSettings(){
+  const name=document.getElementById('s-name').value||'Champion';
+  const salleGoal=parseInt(document.getElementById('s-salle').value)||3;
+  const capGoal=parseInt(document.getElementById('s-cap').value)||2;
+  DATA.settings={name,salleGoal,capGoal};
+  if(SESSION)SESSION.name=name;
+  save();closeSettings();renderUI();
+}
+
+// ── NAV & RENDER ──────────────────────────────────────────────────────────
+
+const PAGES={dash:pageDash,week:pageWeek,sport:pageSport,goals:pageGoals,books:pageBooks,review:pageReview,routine:pageRoutine,stats:pageStats};
+const TLABELS={dash:'Dashboard',week:'Cette Semaine',sport:'Sport',goals:'Objectifs',books:'Lectures',review:'Review du Jour',routine:'Routine',stats:'Stats & Badges'};
+
+function go(tab){TAB=tab;window.scrollTo(0,0);render()}
+
+function renderSidebar(){
+  const groups={principal:[],perso:[]};
+  TABS.forEach(t=>groups[t.group||'principal'].push(t));
+  let html='';
+  html+=`<div class="sb-section">Principal</div>`;
+  groups.principal.forEach(t=>{html+=`<button class="sb-btn${TAB===t.id?' on':''}" onclick="go('${t.id}')"><span class="sb-icon">${t.icon}</span>${t.label}</button>`});
+  html+=`<div class="sb-section">Personnel</div>`;
+  groups.perso.forEach(t=>{html+=`<button class="sb-btn${TAB===t.id?' on':''}" onclick="go('${t.id}')"><span class="sb-icon">${t.icon}</span>${t.label}</button>`});
+  document.getElementById('sb-nav').innerHTML=html;
+  const ini=(SESSION?.name||'?')[0].toUpperCase();
+  document.getElementById('sb-user').innerHTML=`<div class="sb-user-card"><div class="sb-avatar">${ini}</div><div style="flex:1;min-width:0"><div class="sb-user-name">${e(DATA.settings?.name||SESSION?.name||'')}</div><div class="sb-user-email">${e(SESSION?.email||'')}</div></div><button class="sb-logout" onclick="doLogout()" title="Déconnexion">⏻</button></div>`;
+}
+
+function renderTopbar(){
+  const xp=calcXP(),li=getLI(xp),streak=calcStreak();
+  const tb=document.getElementById('tb-title');if(tb)tb.textContent=TLABELS[TAB]||'';
+  const td=document.getElementById('tb-date');if(td)td.textContent=todayFR();
+  const txp=document.getElementById('tb-xp');if(txp)txp.innerHTML=`<span style="font-size:11px;color:#a78bfa;font-weight:600">⚡ ${xp.toLocaleString()} XP</span><span style="font-size:10px;color:#64748b">Niv.${li.cur.l} ${li.cur.n}</span>`;
+  const ts=document.getElementById('tb-streak');if(ts)ts.innerHTML=`<span style="font-size:14px">🔥</span><span style="font-size:12px;color:#fb923c;font-weight:600">${streak} j</span>`;
+  const mxp=document.getElementById('mob-xp');if(mxp)mxp.textContent=`⚡${xp.toLocaleString()} · 🔥${streak}`;
+}
+
+function renderMobileNav(){
+  const el=document.getElementById('nav-row');if(!el)return;
+  el.innerHTML=TABS.map(t=>`<button class="nbtn${TAB===t.id?' on':''}" onclick="go('${t.id}')"><span class="nicon">${t.icon}</span><span class="nlbl">${t.label}</span></button>`).join('');
+}
+
+function renderUI(){
+  renderSidebar();renderTopbar();renderMobileNav();
+}
+
+function render(){
+  renderUI();
+  const scrollY=window.scrollY;
+  document.getElementById('page').innerHTML=PAGES[TAB]();
+  if(TAB!=='review')window.scrollTo(0,scrollY);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+
+SESSION=getSession();
+if(SESSION){
+  DATA=loadUserData(SESSION.email);
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='';
+  render();
+}
+renderSavedAccounts();
+</script>
+</body>
+</html>
