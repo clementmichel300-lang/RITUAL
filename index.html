@@ -403,7 +403,6 @@ let TAB='dash';
 const FS={
   sportOpen:false,sportType:'Salle',sportDur:'',sportInt:7,sportNotes:'',sportCustom:'',
   goalOpen:false,goalTitle:'',goalCat:'Scolaire',goalDl:'',goalDesc:'',
-  bookOpen:false,bookTitle:'',bookAuthor:'',bookCat:'Business',bookStatus:'à_lire',
 };
 
 // ── AUTH STORAGE ──────────────────────────────────────────────────────────
@@ -414,7 +413,7 @@ function getSession(){try{return JSON.parse(localStorage.getItem('rut-session')|
 function saveSession(s){if(s)localStorage.setItem('rut-session',JSON.stringify(s));else localStorage.removeItem('rut-session')}
 function getDataKey(email){return'rut-data-'+btoa(email.toLowerCase().trim())}
 function loadUserData(email){try{const r=localStorage.getItem(getDataKey(email));if(r)return JSON.parse(r)}catch(e){}
-  return{habits:{},reviews:{},sport:{sessions:[]},goals:[],books:[],badges:[],settings:{name:'Champion',salleGoal:3,capGoal:2}}}
+  return{habits:{},reviews:{},sport:{sessions:[]},goals:[],badges:[],settings:{name:'Champion',salleGoal:3,capGoal:2}}}
 function saveUserData(){if(SESSION)localStorage.setItem(getDataKey(SESSION.email),JSON.stringify(DATA))}
 
 // ── AUTH LOGIC ────────────────────────────────────────────────────────────
@@ -537,7 +536,6 @@ function calcXP(){
   });
   Object.values(DATA.reviews||{}).forEach(r=>{if(r){x+=15;if(r.victoire)x+=15}});
   (DATA.goals||[]).forEach(g=>{if(g.completed)x+=50});
-  (DATA.books||[]).forEach(b=>{if(b.status==='lu')x+=40});
   (DATA.sport?.sessions||[]).forEach(()=>x+=25);
   return x;
 }
