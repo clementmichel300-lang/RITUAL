@@ -537,9 +537,10 @@ function calcXP(){
     done.forEach(h=>x+=h.xp);
     if(done.length===H.length)x+=75;
   });
-  Object.values(DATA.reviews||{}).forEach(r=>{if(r&&r.victoire)x+=30});
+  Object.values(DATA.reviews||{}).forEach(r=>{if(r){x+=15;if(r.victoire)x+=15}});
   (DATA.goals||[]).forEach(g=>{if(g.completed)x+=50});
   (DATA.books||[]).forEach(b=>{if(b.status==='lu')x+=40});
+  (DATA.sport?.sessions||[]).forEach(()=>x+=25);
   return x;
 }
 
