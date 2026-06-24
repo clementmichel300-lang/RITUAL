@@ -649,6 +649,58 @@ function pageDash(){
   const nextH=H.find(h=>!dh[h.id]);
   const xpToNext=li.nxt?li.nxt.xp-xp:0;
 
+  // ── Vue d'ensemble data ───────────────────────────────────────────────────
+  const wd7=weekDates();
+  const salleGoal=DATA.settings?.salleGoal||3;
+  const capGoal=DATA.settings?.capGoal||2;
+  const weekSp=(DATA.sport?.sessions||[]).filter(s=>wd7.includes(s.date));
+  const wSalle=weekSp.filter(s=>s.type==='Salle').length;
+  const wCap=weekSp.filter(s=>s.type==='CAP').length;
+  const wKar=weekSp.filter(s=>s.type==='Karaté').length;
+  const totalGoals=(DATA.goals||[]).length;
+  const doneGoals=(DATA.goals||[]).filter(g=>g.completed).length;
+  const weekRevs=wd7.filter(d=>DATA.reviews&&DATA.reviews[d]).length;
+  const weekHabPct=Math.round(wd7.reduce((s,d)=>{const dh2=DATA.habits[d]||{};return s+(H.filter(h=>dh2[h.id]).length/H.length)*100;},0)/7);
+  const totalBadges=(DATA.badges||[]).length;
+  const salleBar=Math.min(100,Math.round((wSalle/salleGoal)*100));
+  const capBar=Math.min(100,Math.round((wCap/capGoal)*100));
+
+  const overviewCard=`<div class="card" style="padding:16px 18px">
+    <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px">Vue d'ensemble</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px">
+        <div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Semaine</div>
+        <div style="font-size:24px;font-weight:800;color:#22d3ee;font-family:'Space Grotesk',sans-serif;line-height:1">${weekHabPct}%</div>
+        <div style="font-size:10px;color:#475569;margin-top:3px">habitudes / jour</div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px">
+        <div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Objectifs</div>
+        <div style="font-size:24px;font-weight:800;color:#a78bfa;font-family:'Space Grotesk',sans-serif;line-height:1">${doneGoals}<span style="font-size:13px;color:#334155">/${totalGoals}</span></div>
+        <div style="font-size:10px;color:#475569;margin-top:3px">complétés</div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px">
+        <div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Reviews</div>
+        <div style="font-size:24px;font-weight:800;color:#fb923c;font-family:'Space Grotesk',sans-serif;line-height:1">${weekRevs}</div>
+        <div style="font-size:10px;color:#475569;margin-top:3px">cette semaine</div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px">
+        <div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Badges</div>
+        <div style="font-size:24px;font-weight:800;color:#fbbf24;font-family:'Space Grotesk',sans-serif;line-height:1">${totalBadges}</div>
+        <div style="font-size:10px;color:#475569;margin-top:3px">débloqués</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:#64748b;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Sport cette semaine</div>
+    <div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:#94a3b8">🏋️ Salle</span><span style="color:${wSalle>=salleGoal?'#10b981':'#64748b'};font-weight:700">${wSalle}/${salleGoal}</span></div>
+      <div class="bar" style="height:5px"><div style="height:100%;width:${salleBar}%;background:${wSalle>=salleGoal?'#10b981':'#7c3aed'};border-radius:99px;transition:width .6s"></div></div>
+    </div>
+    <div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:#94a3b8">🏃 CAP</span><span style="color:${wCap>=capGoal?'#10b981':'#64748b'};font-weight:700">${wCap}/${capGoal}</span></div>
+      <div class="bar" style="height:5px"><div style="height:100%;width:${capBar}%;background:${wCap>=capGoal?'#10b981':'#22d3ee'};border-radius:99px;transition:width .6s"></div></div>
+    </div>
+    ${wKar>0?`<div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-top:5px"><span>🥋 Karaté</span><span style="color:#f59e0b;font-weight:700">${wKar} séance${wKar>1?'s':''}</span></div>`:''}
+  </div>`;
+
   let habitsHTML='';
   cats.forEach(cat=>{
     const ch=H.filter(h=>h.c===cat),cd=ch.filter(h=>dh[h.id]).length;
@@ -721,6 +773,7 @@ function pageDash(){
             <div style="font-size:16px;font-weight:700;color:${li.nxt.col};font-family:'Space Grotesk',sans-serif">${li.nxt.n}</div>
             <div style="font-size:12px;color:#475569;margin-top:3px">${xpToNext.toLocaleString()} XP manquants</div>
           </div>`:''}
+          ${overviewCard}
         </div>
       </div>
     </div>`;
@@ -748,6 +801,7 @@ function pageDash(){
     </div>
     ${perfectCard}${nextCard}
     ${xpPanel(xp,li,streak)}
+    ${overviewCard}
     <div class="card" style="padding:0;overflow:hidden">${habitsHTML}</div>
   </div>`;
 }
