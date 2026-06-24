@@ -631,13 +631,23 @@ function pageDash(){
   const pc=pct>=80?'#10b981':pct>=50?'#f59e0b':'#ef4444';
   const cats=['Matin','Journée','Soir'],ci={Matin:'🌅',Journée:'☀️',Soir:'🌙'};
   const perfect=done===H.length;
+  const hr=new Date().getHours();
+  const activeCat=hr<12?'Matin':hr<19?'Journée':'Soir';
+  const todayXP=H.filter(h=>dh[h.id]).reduce((s,h)=>s+h.xp,0)+(perfect?75:0);
+  const nextH=H.find(h=>!dh[h.id]);
+  const xpToNext=li.nxt?li.nxt.xp-xp:0;
 
   let habitsHTML='';
   cats.forEach(cat=>{
     const ch=H.filter(h=>h.c===cat),cd=ch.filter(h=>dh[h.id]).length;
-    habitsHTML+=`<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${ci[cat]}</span><span style="font-weight:600;font-size:13px">${cat}</span></div>
-      <span style="font-size:11px;color:#475569;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:99px">${cd}/${ch.length}</span></div>`;
+    const isActive=cat===activeCat,allDone=cd===ch.length;
+    habitsHTML+=`<div style="margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px 6px">
+        <span style="font-size:13px">${ci[cat]}</span>
+        <span style="font-size:11px;font-weight:700;color:${isActive?'#e2e8f0':'#475569'};text-transform:uppercase;letter-spacing:.1em">${cat}</span>
+        <span style="font-size:11px;color:${allDone?'#10b981':'#334155'};margin-left:auto;font-weight:600">${cd}/${ch.length}</span>
+        ${allDone?'<span style="font-size:11px">✅</span>':''}
+      </div>`;
     ch.forEach(h=>{
       const isDone=!!dh[h.id];
       habitsHTML+=`<button class="hbtn${isDone?' done':''}" onclick="toggleHabit('${h.id}')">
@@ -647,42 +657,86 @@ function pageDash(){
     habitsHTML+='</div>';
   });
 
+  const nextCard=!perfect&&nextH?`<div class="card" style="border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.05);display:flex;align-items:center;gap:12px;margin-bottom:14px">
+    <span style="font-size:22px">${nextH.i}</span>
+    <div style="flex:1"><div style="font-size:9px;color:#7c3aed;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">Prochaine habitude</div><div style="font-size:13px;font-weight:600;color:#e2e8f0">${nextH.l}</div></div>
+    <span style="font-size:13px;font-weight:700;color:#a78bfa;flex-shrink:0">+${nextH.xp} XP</span>
+  </div>`:'';
+
+  const perfectCard=perfect?`<div class="pglow" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px">
+    <div style="font-size:36px;margin-bottom:6px">🏆</div>
+    <div style="font-weight:800;color:#fbbf24;font-size:16px;font-family:'Space Grotesk',sans-serif">JOURNÉE PARFAITE</div>
+    <div style="font-size:12px;color:#64748b;margin-top:4px">+75 XP bonus · ${todayXP} XP aujourd'hui</div>
+  </div>`:'';
+
   const isDesktop=window.innerWidth>=768;
+
   if(isDesktop){
     return`<div class="page-anim">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px">
-        <h2 style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#e2e8f0">Bonjour, ${e(DATA.settings?.name||SESSION?.name||'Champion')} 👋</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div style="font-size:11px;color:#475569;letter-spacing:.12em;text-transform:uppercase">${todayFR()}</div>
+          <h1 style="font-size:26px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#e2e8f0;margin-top:3px">Bonjour, ${e(DATA.settings?.name||SESSION?.name||'Champion')} 👋</h1>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div style="text-align:center;padding:10px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px">
+            <div style="font-size:22px;font-weight:800;color:#fb923c;font-family:'Space Grotesk',sans-serif">${streak}🔥</div>
+            <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Streak</div>
+          </div>
+          <div style="text-align:center;padding:10px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px">
+            <div style="font-size:22px;font-weight:800;color:#a78bfa;font-family:'Space Grotesk',sans-serif">+${todayXP}</div>
+            <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">XP aujourd'hui</div>
+          </div>
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:2fr 1fr;gap:18px;align-items:start">
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start">
+        <div>
+          ${perfectCard}${nextCard}
+          <div class="card" style="padding:0;overflow:hidden">${habitsHTML}</div>
+        </div>
         <div>
           ${xpPanel(xp,li,streak)}
           <div class="card" style="display:flex;align-items:center;gap:16px">
-            <div style="position:relative;flex-shrink:0">${ring(pct,90,7,pc)}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-size:14px;font-weight:700;color:${pc}">${Math.round(pct)}%</span></div></div>
-            <div style="flex:1">
-              <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Habitudes du jour</div>
-              <div style="font-size:32px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#22d3ee;line-height:1.1">${done}<span style="font-size:17px;color:#475569">/${H.length}</span></div>
-              <div style="font-size:12px;color:${perfect?'#10b981':'#64748b'};margin-top:2px">${perfect?'🏆 Journée parfaite !':done===0?'Commence ta journée 💪':`${H.length-done} habitude${H.length-done>1?'s':''} restante${H.length-done>1?'s':''}`}</div>
+            <div style="position:relative;flex-shrink:0">${ring(pct,88,7,pc)}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-size:15px;font-weight:700;color:${pc}">${Math.round(pct)}%</span></div></div>
+            <div>
+              <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Aujourd'hui</div>
+              <div style="font-size:34px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#22d3ee;line-height:1">${done}<span style="font-size:16px;color:#475569">/${H.length}</span></div>
+              <div style="font-size:12px;color:${perfect?'#10b981':'#64748b'};margin-top:3px">${perfect?'Parfait 🏆':done===0?'C\'est parti 💪':`${H.length-done} restante${H.length-done>1?'s':''}`}</div>
             </div>
           </div>
-          ${perfect?`<div class="pglow" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:18px;padding:18px;text-align:center;margin-bottom:14px"><div style="font-size:36px;margin-bottom:6px">🏆</div><div style="font-weight:700;color:#fbbf24;font-size:16px;font-family:'Space Grotesk',sans-serif">JOURNÉE PARFAITE</div><div style="font-size:12px;color:#64748b;margin-top:4px">+75 XP bonus débloqué</div></div>`:''}
+          ${li.nxt?`<div class="card" style="text-align:center;border-color:rgba(167,139,250,.12);background:rgba(167,139,250,.03)">
+            <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Prochain niveau</div>
+            <div style="font-size:16px;font-weight:700;color:${li.nxt.col};font-family:'Space Grotesk',sans-serif">${li.nxt.n}</div>
+            <div style="font-size:12px;color:#475569;margin-top:3px">${xpToNext.toLocaleString()} XP manquants</div>
+          </div>`:''}
         </div>
-        <div>${habitsHTML}</div>
       </div>
     </div>`;
   }
 
   return`<div class="page-anim">
-    <div style="text-align:center;padding:4px 0 10px">
-      <div style="font-size:11px;color:#475569;letter-spacing:.12em;text-transform:uppercase">${todayFR()}</div>
-      <h1 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-top:4px">Bonjour, ${e(DATA.settings?.name||SESSION?.name||'Champion')} !</h1>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div style="font-size:10px;color:#475569;letter-spacing:.12em;text-transform:uppercase">${todayFR()}</div>
+        <h1 style="font-size:19px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#e2e8f0;margin-top:2px">Bonjour, ${e(DATA.settings?.name||SESSION?.name||'Champion')} 👋</h1>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:18px;font-weight:800;color:#fb923c">${streak}🔥</div>
+        <div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">streak</div>
+      </div>
     </div>
+    <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <div style="position:relative;flex-shrink:0">${ring(pct,78,7,pc)}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-size:13px;font-weight:700;color:${pc}">${Math.round(pct)}%</span></div></div>
+      <div style="flex:1">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Habitudes</div>
+        <div style="font-size:30px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#22d3ee;line-height:1.1">${done}<span style="font-size:15px;color:#475569">/${H.length}</span></div>
+        <div style="font-size:11px;color:#a78bfa;margin-top:2px;font-weight:600">+${todayXP} XP aujourd'hui</div>
+      </div>
+      ${li.nxt?`<div style="text-align:right;flex-shrink:0"><div style="font-size:11px;font-weight:700;color:${li.cur.col}">${li.cur.n}</div><div style="font-size:9px;color:#475569;margin-top:2px">Niv. ${li.cur.l}</div><div style="font-size:9px;color:#334155;margin-top:2px">${xpToNext.toLocaleString()} XP</div></div>`:''}
+    </div>
+    ${perfectCard}${nextCard}
     ${xpPanel(xp,li,streak)}
-    <div class="card" style="display:flex;align-items:center;gap:12px">
-      <div style="position:relative;flex-shrink:0">${ring(pct,76,6,pc)}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-size:13px;font-weight:700;color:${pc}">${Math.round(pct)}%</span></div></div>
-      <div style="flex:1"><div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Habitudes du jour</div><div style="font-size:28px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#22d3ee;line-height:1.1">${done}<span style="font-size:15px;color:#475569">/${H.length}</span></div><div style="font-size:12px;color:${perfect?'#10b981':'#64748b'};margin-top:2px">${perfect?'🏆 Journée parfaite !':done===0?'Commence ta journée 💪':`${H.length-done} habitude${H.length-done>1?'s':''} restante${H.length-done>1?'s':''}`}</div></div>
-    </div>
-    ${habitsHTML}
-    ${perfect?`<div class="pglow" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:16px;padding:18px;text-align:center;margin-bottom:12px"><div style="font-size:32px;margin-bottom:6px">🏆</div><div style="font-weight:700;color:#fbbf24;font-size:15px;font-family:'Space Grotesk',sans-serif">JOURNÉE PARFAITE</div><div style="font-size:12px;color:#64748b;margin-top:4px">+75 XP bonus débloqué</div></div>`:''}
+    <div class="card" style="padding:0;overflow:hidden">${habitsHTML}</div>
   </div>`;
 }
 
