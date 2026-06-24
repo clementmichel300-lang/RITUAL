@@ -957,25 +957,65 @@ return`<div class="page-anim">
 
 // ── PAGE: ROUTINE ─────────────────────────────────────────────────────────
 
+const SCH_DEFAULT=[
+  {t:'7h30',a:'Réveil FIXE ⏰',c:'#ef4444'},{t:'7h30–35',a:'500ml eau + fenêtre 💧',c:'#3b82f6'},
+  {t:'7h35–50',a:'Hygiène + crème acné matin 🧴',c:'#ec4899'},{t:'7h50–8h10',a:'Créatine 3g + crêpe protéinée 🥞',c:'#ec4899'},
+  {t:'8h10–30',a:'10 min dehors + shadow boxing 2 rounds 🥊',c:'#10b981'},{t:'8h30–40',a:'Todoist : 3 tâches + planifier DW 📋',c:'#3b82f6'},
+  {t:'8h40–10h10',a:'Deep Work #1 — 90 min 💻',c:'#3b82f6'},{t:'10h10–25',a:'Pause active ☕',c:'#475569'},
+  {t:'10h25–12h',a:'Deep Work #2 — 90 min 💻',c:'#3b82f6'},{t:'12h–13h',a:'Déjeuner famille 🍽️',c:'#475569'},
+  {t:'13h–14h',a:'Marche 15 min 🚶',c:'#10b981'},{t:'14h–17h',a:'Sport 🏋️',c:'#10b981'},
+  {t:'17h–19h',a:'Formation IA / Projet (2h max) 🤖',c:'#3b82f6'},{t:'19h–20h',a:'Dîner famille 🍽️',c:'#475569'},
+  {t:'20h–22h',a:'Review + Todoist demain 📝',c:'#3b82f6'},{t:'22h00',a:'PC ÉTEINT ⛔',c:'#ef4444'},
+  {t:'22h–10',a:'Douche 🚿',c:'#ec4899'},{t:'22h10–20',a:'Crème acné soir 🧴',c:'#ec4899'},
+  {t:'22h20–28',a:'Brain dump papier 📓',c:'#3b82f6'},{t:'22h28–30',a:'Chapelet 📿',c:'#ec4899'},
+  {t:'22h30',a:'Extinction — dormir 😴',c:'#ef4444'},
+];
+const SCH_COLS=['#ef4444','#3b82f6','#10b981','#ec4899','#f59e0b','#475569'];
+
 function pageRoutine(){
-  const SCH=[
-    {t:'7h30',a:'Réveil FIXE ⏰',c:'#ef4444'},{t:'7h30–35',a:'500ml eau + fenêtre 💧',c:'#3b82f6'},
-    {t:'7h35–50',a:'Hygiène + crème acné matin 🧴',c:'#ec4899'},{t:'7h50–8h10',a:'Créatine 3g + crêpe protéinée 🥞',c:'#ec4899'},
-    {t:'8h10–30',a:'10 min dehors + shadow boxing 2 rounds 🥊',c:'#10b981'},{t:'8h30–40',a:'Todoist : 3 tâches + planifier DW 📋',c:'#3b82f6'},
-    {t:'8h40–10h10',a:'Deep Work #1 — 90 min 💻',c:'#3b82f6'},{t:'10h10–25',a:'Pause active ☕',c:'#475569'},
-    {t:'10h25–12h',a:'Deep Work #2 — 90 min 💻',c:'#3b82f6'},{t:'12h–13h',a:'Déjeuner famille 🍽️',c:'#475569'},
-    {t:'13h–14h',a:'Marche 15 min 🚶',c:'#10b981'},{t:'14h–17h',a:'Sport 🏋️',c:'#10b981'},
-    {t:'17h–19h',a:'Formation IA / Projet (2h max) 🤖',c:'#3b82f6'},{t:'19h–20h',a:'Dîner famille 🍽️',c:'#475569'},
-    {t:'20h–22h',a:'Review + Todoist demain 📝',c:'#3b82f6'},{t:'22h00',a:'PC ÉTEINT ⛔',c:'#ef4444'},
-    {t:'22h–10',a:'Douche 🚿',c:'#ec4899'},{t:'22h10–20',a:'Crème acné soir 🧴',c:'#ec4899'},
-    {t:'22h20–28',a:'Brain dump papier 📓',c:'#3b82f6'},{t:'22h28–30',a:'Chapelet 📿',c:'#ec4899'},
-    {t:'22h30',a:'Extinction — dormir 😴',c:'#ef4444'},
-  ];
+  const SCH=DATA.schedule||SCH_DEFAULT;
+  const edit=FS.schEdit;
+  const items=FS.schItems||SCH;
+
+  let scheduleHTML='';
+  if(edit){
+    scheduleHTML=items.map((item,i)=>`
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <input value="${e(item.t)}" oninput="FS.schItems[${i}].t=this.value"
+          style="width:70px;flex-shrink:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 7px;color:#e2e8f0;font-size:11px;font-family:monospace;outline:none"/>
+        <div style="display:flex;gap:3px;flex-shrink:0">
+          ${SCH_COLS.map(col=>`<button onclick="FS.schItems[${i}].c='${col}';render()" style="width:14px;height:14px;border-radius:50%;border:2px solid ${item.c===col?'#fff':'transparent'};background:${col};cursor:pointer;padding:0"></button>`).join('')}
+        </div>
+        <input value="${e(item.a)}" oninput="FS.schItems[${i}].a=this.value"
+          style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 8px;color:#e2e8f0;font-size:12px;outline:none"/>
+        <button onclick="delSchItem(${i})" style="flex-shrink:0;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25);border-radius:7px;color:#ef4444;font-size:13px;cursor:pointer;padding:3px 7px;line-height:1">✕</button>
+      </div>`).join('');
+    scheduleHTML+=`<button onclick="addSchItem()" style="width:100%;margin-top:8px;padding:8px;background:rgba(34,211,238,.08);border:1px dashed rgba(34,211,238,.3);border-radius:10px;color:#22d3ee;font-size:12px;cursor:pointer">+ Ajouter un créneau</button>`;
+  } else {
+    scheduleHTML=items.map(item=>`<div style="display:flex;align-items:center;gap:10px;padding:5px 6px;border-radius:8px">
+      <span style="font-size:10px;color:#475569;width:64px;flex-shrink:0;font-family:monospace">${e(item.t)}</span>
+      <div style="width:3px;height:20px;border-radius:99px;background:${item.c};flex-shrink:0"></div>
+      <span style="font-size:12px;color:#94a3b8">${e(item.a)}</span>
+    </div>`).join('');
+  }
+
   return`<div class="page-anim">
     <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-bottom:16px">Routine & Règles</h2>
     <div class="card" style="border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.04)"><div style="font-size:13px;font-weight:700;color:#ef4444;margin-bottom:10px">⚡ RÈGLES NON-NÉGOCIABLES</div>${['⏰ Réveil fixe 7h30 — même couché à 2h','🖥️ PC éteint à 22h00','✅ 3 tâches Todoist max — complète d\'abord','💪 Sport avant réseaux sociaux','🏋️ Salle 3×/sem + CAP 2×/sem — no excuse'].map((r,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:9px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.1);margin-bottom:5px;font-size:13px"><span style="color:#ef4444;font-weight:700;width:18px;flex-shrink:0">${i+1}.</span><span style="color:#e2e8f0">${r}</span></div>`).join('')}</div>
     <div class="card" style="border-color:rgba(16,185,129,.15)"><div style="font-size:13px;font-weight:700;color:#10b981;margin-bottom:10px">🗓️ Planning Sport</div>${[{d:'Mardi',t:'18h15',s:'CAP 🏃',n:'Selon dispo'},{d:'Jeudi',t:'18h15',s:'CAP 🏃'},{d:'Vendredi',t:'18h30',s:'Karaté 🥋',n:'Départ 17h25'},{d:'Quotidien',t:'Matin',s:'Shadow boxing + étirements 🥊'},{d:'Salle',t:'À fixer',s:'Musculation 🏋️',n:'Avec parents'}].map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:9px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.08);margin-bottom:5px"><div style="flex:1"><div style="font-size:12px;font-weight:600;color:#10b981">${s.d} <span style="color:#475569;font-weight:400">· ${s.t}</span></div><div style="font-size:11px;color:#94a3b8">${s.s}${s.n?' · '+s.n:''}</div></div></div>`).join('')}</div>
-    <div class="card"><div style="font-size:13px;font-weight:700;color:#22d3ee;margin-bottom:10px">⏱️ Programme Journalier</div>${SCH.map(item=>`<div style="display:flex;align-items:center;gap:10px;padding:5px 6px;border-radius:8px"><span style="font-size:10px;color:#475569;width:64px;flex-shrink:0;font-family:monospace">${item.t}</span><div style="width:3px;height:20px;border-radius:99px;background:${item.c};flex-shrink:0"></div><span style="font-size:12px;color:#94a3b8">${item.a}</span></div>`).join('')}</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:#22d3ee">⏱️ Programme Journalier</div>
+        <div style="display:flex;gap:6px">
+          ${edit
+            ?`<button onclick="saveSchEdit()" style="padding:5px 12px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:8px;color:#fff;font-size:11px;font-weight:600;cursor:pointer">✅ Sauvegarder</button>
+               <button onclick="cancelSchEdit()" style="padding:5px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#64748b;font-size:11px;cursor:pointer">Annuler</button>`
+            :`<button onclick="toggleSchEdit()" style="padding:5px 12px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.25);border-radius:8px;color:#a78bfa;font-size:11px;font-weight:600;cursor:pointer">✏️ Modifier</button>`
+          }
+        </div>
+      </div>
+      ${scheduleHTML}
+    </div>
     <div class="card" style="border-color:rgba(124,58,237,.15)"><div style="font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:10px">😴 Reset Sommeil</div>${[['J1–J3','22h30','8h00'],['J4–J6','22h15','7h45'],['J7+','22h00','7h30']].map(([p,c,r])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:9px;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.12);margin-bottom:5px"><span style="font-size:13px;font-weight:600;color:#a78bfa">${p}</span><div style="display:flex;gap:16px;font-size:12px;color:#64748b"><span>🌙 ${c}</span><span>🌅 ${r}</span></div></div>`).join('')}</div>
   </div>`;
 }
@@ -1044,6 +1084,21 @@ function saveReview(){
   if(btn){btn.textContent='✅ Review sauvegardée !';btn.style.background='linear-gradient(135deg,#10b981,#059669)';setTimeout(()=>{if(btn){btn.textContent='💾 Sauvegarder la review';btn.style.background=''}},2500)}
   const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);
 }
+
+// ── SCHEDULE EDIT ─────────────────────────────────────────────────────────
+
+function toggleSchEdit(){
+  FS.schEdit=true;
+  FS.schItems=JSON.parse(JSON.stringify(DATA.schedule||SCH_DEFAULT));
+  render();
+}
+function cancelSchEdit(){FS.schEdit=false;FS.schItems=null;render();}
+function saveSchEdit(){
+  DATA.schedule=JSON.parse(JSON.stringify(FS.schItems));
+  save();FS.schEdit=false;FS.schItems=null;toast('📅 Routine sauvegardée');render();
+}
+function delSchItem(i){FS.schItems.splice(i,1);render();}
+function addSchItem(){FS.schItems.push({t:'',a:'',c:'#475569'});render();}
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────
 
