@@ -825,41 +825,6 @@ function pageGoals(){
 
 // ── PAGE: LECTURES ────────────────────────────────────────────────────────
 
-function pageBooks(){
-  const books=DATA.books||[];
-  const STATS=[{k:'à_lire',l:'À lire',i:'📋',c:'#64748b'},{k:'en_cours',l:'En cours',i:'📖',c:'#3b82f6'},{k:'lu',l:'Lu',i:'✅',c:'#10b981'},{k:'abandonné',l:'Abandonné',i:'❌',c:'#ef4444'}];
-  const BCATS=['Business','IA','Santé','Sport','Biographie','Roman','Développement','Finance'];
-  const read=books.filter(b=>b.status==='lu').length;
-  const catChips=BCATS.map(c=>`<button class="chip${FS.bookCat===c?' on':''}" onclick="FS.bookCat='${c}';render()">${c}</button>`).join('');
-  const statChips=STATS.map(s=>`<button class="chip${FS.bookStatus===s.k?' on':''}" style="${FS.bookStatus===s.k?'background:'+s.c:''}" onclick="FS.bookStatus='${s.k}';render()">${s.i} ${s.l}</button>`).join('');
-  const form=FS.bookOpen?`<div class="card" style="border-color:rgba(124,58,237,.2);margin-bottom:14px">
-    <div style="font-size:13px;font-weight:600;color:#a78bfa;margin-bottom:12px">Nouveau livre</div>
-    <input id="b-title" placeholder="Titre..." value="${e(FS.bookTitle)}" oninput="FS.bookTitle=this.value" style="margin-bottom:10px">
-    <input id="b-author" placeholder="Auteur..." value="${e(FS.bookAuthor)}" oninput="FS.bookAuthor=this.value" style="margin-bottom:10px">
-    <label class="lbl">Catégorie</label><div style="margin-bottom:10px">${catChips}</div>
-    <label class="lbl">Statut</label><div style="margin-bottom:12px">${statChips}</div>
-    <button class="btn-full" onclick="addBook()">✅ Ajouter le livre</button>
-  </div>`:'';
-  let booksHTML='';
-  STATS.forEach(s=>{
-    const grp=books.filter(b=>b.status===s.k);if(!grp.length)return;
-    booksHTML+=`<div style="font-size:12px;font-weight:600;color:${s.c};margin-bottom:8px">${s.i} ${s.l} (${grp.length})</div>`;
-    grp.forEach(b=>{
-      const stars=b.status==='lu'?`<div style="display:flex;gap:1px">${[1,2,3,4,5].map(i=>`<button onclick="rateBook(${b.id},${i})" style="background:none;border:none;font-size:16px;cursor:pointer;color:${i<=(b.rating||0)?'#f59e0b':'#1e293b'};padding:1px">★</button>`).join('')}</div>`:'';
-      booksHTML+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;gap:10px"><div style="flex:1"><div style="font-weight:600;font-size:13px">${e(b.title)}</div>${b.author?`<div style="font-size:11px;color:#64748b">${e(b.author)}</div>`:''}<div style="display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap"><span style="font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.06);color:#64748b">${e(b.cat)}</span><select onchange="updateBook(${b.id},'status',this.value)" style="width:auto;padding:2px 8px;font-size:11px;cursor:pointer">${STATS.map(st=>`<option value="${st.k}"${b.status===st.k?' selected':''}>${st.l}</option>`).join('')}</select></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">${stars}<button onclick="delBook(${b.id})" style="background:none;border:none;color:#334155;font-size:18px;cursor:pointer">×</button></div></div></div>`;
-    });
-  });
-  return`<div class="page-anim">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif">Lectures</h2>
-      <button class="${FS.bookOpen?'btn-d':'btn-p'}" onclick="FS.bookOpen=!FS.bookOpen;render()">${FS.bookOpen?'✕ Annuler':'+ Livre'}</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">${STATS.map(s=>`<div class="card" style="padding:10px 4px;text-align:center;margin-bottom:0"><div style="font-size:18px">${s.i}</div><div style="font-size:20px;font-weight:700;color:${s.c}">${books.filter(b=>b.status===s.k).length}</div><div style="font-size:9px;color:#475569">${s.l}</div></div>`).join('')}</div>
-    ${read>0?`<div class="card" style="display:flex;align-items:center;gap:10px;border-color:rgba(16,185,129,.2);background:rgba(16,185,129,.05);margin-bottom:14px"><span style="font-size:22px">🏆</span><div><div style="font-weight:600;color:#10b981;font-size:13px">${read} livre${read>1?'s':''} terminé${read>1?'s':''}</div><div style="font-size:11px;color:#64748b">+${read*40} XP gagnés</div></div></div>`:''}
-    ${form}${booksHTML}
-    ${books.length===0&&!FS.bookOpen?`<div class="card" style="padding:24px;text-align:center;color:#475569;font-size:13px">Aucun livre. Start reading ! 📚</div>`:''}
-  </div>`;
-}
 
 // ── PAGE: REVIEW ──────────────────────────────────────────────────────────
 
