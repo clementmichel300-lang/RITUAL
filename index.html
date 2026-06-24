@@ -872,11 +872,7 @@ function pageReview(){
   const r=DATA._rv;
   const ec=n=>n>=8?'#10b981':n>=5?'#f59e0b':'#ef4444';
   const en=parseInt(r.energie||7);
-  const genCheckin=()=>{
-    const dh=DATA.habits[today]||{},xp=calcXP(),streak=calcStreak();
-    return`📊 CHECK-IN DU ${todayFR().toUpperCase()}\n\n🔥 Streak : ${streak} jour${streak>1?'s':''}\n⚡ XP : ${xp.toLocaleString()}\n\n✅ HABITUDES (${H.filter(h=>dh[h.id]).length}/${H.length})\n${H.map(h=>`${dh[h.id]?'✅':'❌'} ${h.l}`).join('\n')}\n\n😴 Coucher : ${r.coucher||'—'} | Réveil : ${r.reveil||'—'}\n⚡ Énergie : ${r.energie}/10\n\n💻 DW1 : ${r.dw1_fait||'—'}\n💻 DW2 : ${r.dw2_fait||'—'}\n📅 DW1 demain : ${r.dw1_dem||'—'}\n📅 DW2 demain : ${r.dw2_dem||'—'}\n\n🏆 Victoire : ${r.victoire||'—'}\n🚧 Blocage : ${r.blocage||'—'}\n📈 À améliorer : ${r.ameliorer||'—'}`;
-  };
-  return`<div class="page-anim">
+return`<div class="page-anim">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h2 class="gtext" style="font-size:20px;font-weight:800;font-family:'Space Grotesk',sans-serif">Review du Jour</h2>
       <div style="font-size:11px;color:#475569">${todayFR()}</div>
@@ -885,9 +881,7 @@ function pageReview(){
     <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:10px">😴 Sommeil</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label class="lbl">Coucher hier</label><input type="time" value="${r.coucher||''}" oninput="DATA._rv.coucher=this.value"></div><div><label class="lbl">Réveil</label><input type="time" value="${r.reveil||''}" oninput="DATA._rv.reveil=this.value"></div></div></div>
     <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:10px">💻 Deep Work</div><label class="lbl">DW #1 — ce que j'ai fait</label><textarea rows="2" oninput="DATA._rv.dw1_fait=this.value" placeholder="Ex: Formation Make.com..." style="margin-bottom:10px">${e(r.dw1_fait||'')}</textarea><label class="lbl">DW #2 — ce que j'ai fait</label><textarea rows="2" oninput="DATA._rv.dw2_fait=this.value" placeholder="Ex: Veille IA..." style="margin-bottom:10px">${e(r.dw2_fait||'')}</textarea><div style="border-top:1px solid rgba(255,255,255,.06);padding-top:10px"><div style="font-size:11px;color:#7c3aed;font-weight:600;margin-bottom:8px">📅 Prévu pour demain</div><input placeholder="DW #1 demain..." value="${e(r.dw1_dem||'')}" oninput="DATA._rv.dw1_dem=this.value" style="margin-bottom:8px"><input placeholder="DW #2 demain..." value="${e(r.dw2_dem||'')}" oninput="DATA._rv.dw2_dem=this.value"></div></div>
     <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:10px">🪞 Réflexion</div><label class="lbl">🏆 Victoire du jour</label><textarea rows="2" oninput="DATA._rv.victoire=this.value" placeholder="Quelle est ta plus grande victoire ?" style="margin-bottom:10px">${e(r.victoire||'')}</textarea><label class="lbl">🚧 Blocage rencontré</label><textarea rows="2" oninput="DATA._rv.blocage=this.value" placeholder="Qu'est-ce qui t'a bloqué ?" style="margin-bottom:10px">${e(r.blocage||'')}</textarea><label class="lbl">📈 1 chose à améliorer</label><textarea rows="2" oninput="DATA._rv.ameliorer=this.value" placeholder="Qu'est-ce que tu vas améliorer demain ?">${e(r.ameliorer||'')}</textarea></div>
-    <button class="btn-full" id="save-btn" onclick="saveReview()" style="margin-bottom:12px">💾 Sauvegarder la review</button>
-    <div class="card"><button onclick="FS.checkinOpen=!FS.checkinOpen;render()" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:13px;font-weight:600;font-family:'Inter',sans-serif"><span>🤖 Générer check-in pour Claude</span><span>${FS.checkinOpen?'▲':'▼'}</span></button>${FS.checkinOpen?`<div style="margin-top:12px"><pre id="checkin-pre" style="font-size:11px;color:#64748b;background:rgba(0,0,0,.3);padding:12px;border-radius:10px;line-height:1.6;max-height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace">${e(genCheckin())}</pre><button id="copy-btn" onclick="copyCheckin()" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(124,58,237,.25);background:rgba(124,58,237,.08);color:#a78bfa;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">📋 Copier dans le presse-papier</button></div>`:''}
-    </div>
+    <button class="btn-full" id="save-btn" onclick="saveReview()">💾 Sauvegarder la review</button>
   </div>`;
 }
 
@@ -940,26 +934,6 @@ function pageStats(){
   </div>`;
 }
 
-// ── COPY CHECKIN ──────────────────────────────────────────────────────────
-
-function copyCheckin(){
-  const pre=document.getElementById('checkin-pre');
-  const btn=document.getElementById('copy-btn');
-  if(!pre)return;
-  const text=pre.innerText||pre.textContent||'';
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>{
-      if(btn){btn.textContent='✅ Copié !';btn.style.color='#10b981';setTimeout(()=>{btn.textContent='📋 Copier dans le presse-papier';btn.style.color='#a78bfa'},2000)}
-    }).catch(()=>fallbackCopy(text,btn));
-  } else {fallbackCopy(text,btn)}
-}
-function fallbackCopy(text,btn){
-  const ta=document.createElement('textarea');
-  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
-  document.body.appendChild(ta);ta.focus();ta.select();
-  try{document.execCommand('copy');if(btn){btn.textContent='✅ Copié !';btn.style.color='#10b981';setTimeout(()=>{btn.textContent='📋 Copier dans le presse-papier';btn.style.color='#a78bfa'},2000)}}catch(e){}
-  document.body.removeChild(ta);
-}
 
 // ── ACTIONS ───────────────────────────────────────────────────────────────
 
