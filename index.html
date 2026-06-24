@@ -370,7 +370,6 @@ const BG=[
   {id:'b7',i:'🧠',n:'Introspecteur',   d:'10 reviews complétées',       r:'rare'},
   {id:'b8',i:'🥊',n:'Guerrier MMA',    d:'10 séances de sport',         r:'rare'},
   {id:'b9',i:'💻',n:'Focus Absolu',    d:'20 Deep Works complétés',     r:'epic'},
-  {id:'ba',i:'📚',n:'Lecteur Pro',     d:'5 livres terminés',           r:'rare'},
   {id:'bb',i:'🎯',n:'Architecte',      d:'5 objectifs créés',           r:'common'},
   {id:'bc',i:'🚀',n:'Niveau 5',        d:'Champion atteint',            r:'epic'},
   {id:'bd',i:'🌟',n:'APEX PREDATOR',   d:'Niveau 10 atteint',           r:'legendary'},
@@ -928,17 +927,6 @@ function addGoal(){
 function toggleGoal(id){const g=DATA.goals.find(x=>x.id===id);if(!g)return;g.completed=!g.completed;save();const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render()}
 function delGoal(id){DATA.goals=DATA.goals.filter(x=>x.id!==id);save();render()}
 function setGoalProg(id,v){const g=DATA.goals.find(x=>x.id===id);if(!g)return;g.prog=+v;save()}
-function addBook(){
-  const title=document.getElementById('b-title')?.value||FS.bookTitle;if(!title)return;
-  const author=document.getElementById('b-author')?.value||FS.bookAuthor;
-  if(!DATA.books)DATA.books=[];
-  DATA.books.push({id:Date.now(),title,author,cat:FS.bookCat,status:FS.bookStatus,rating:0,addedAt:gdk()});
-  save();FS.bookOpen=false;FS.bookTitle='';FS.bookAuthor='';
-  const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render();
-}
-function updateBook(id,key,val){const b=DATA.books.find(x=>x.id===id);if(!b)return;b[key]=val;save();const xp=calcXP(),streak=calcStreak();checkBadges(xp,streak);render()}
-function rateBook(id,n){updateBook(id,'rating',n)}
-function delBook(id){DATA.books=DATA.books.filter(x=>x.id!==id);save();render()}
 function saveReview(){
   const today=gdk(),r=DATA._rv||{};
   if(!DATA.reviews)DATA.reviews={};
@@ -973,8 +961,8 @@ function saveSettings(){
 
 // ── NAV & RENDER ──────────────────────────────────────────────────────────
 
-const PAGES={dash:pageDash,week:pageWeek,sport:pageSport,goals:pageGoals,books:pageBooks,review:pageReview,routine:pageRoutine,stats:pageStats};
-const TLABELS={dash:'Dashboard',week:'Cette Semaine',sport:'Sport',goals:'Objectifs',books:'Lectures',review:'Review du Jour',routine:'Routine',stats:'Stats & Badges'};
+const PAGES={dash:pageDash,week:pageWeek,sport:pageSport,goals:pageGoals,review:pageReview,routine:pageRoutine,stats:pageStats};
+const TLABELS={dash:'Dashboard',week:'Cette Semaine',sport:'Sport',goals:'Objectifs',review:'Review du Jour',routine:'Routine',stats:'Stats & Badges'};
 
 function go(tab){TAB=tab;window.scrollTo(0,0);render()}
 
