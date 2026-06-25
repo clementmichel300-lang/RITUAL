@@ -690,6 +690,42 @@ function pageDash(){
     ${wKar>0?`<div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-top:5px"><span>🥋 Karaté</span><span style="color:#f59e0b;font-weight:700">${wKar} séance${wKar>1?'s':''}</span></div>`:''}
   </div>`;
 
+  const siteNavCard=`<div class="card" style="padding:14px 16px">
+    <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Navigation rapide</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      ${[
+        {id:'week',icon:'📅',label:'Semaine',stat:weekHabPct+'% / jour',col:'#22d3ee'},
+        {id:'sport',icon:'💪',label:'Sport',stat:weekSp.length+' séance'+(weekSp.length!==1?'s':'')+' cette sem.',col:'#10b981'},
+        {id:'goals',icon:'🎯',label:'Objectifs',stat:doneGoals+'/'+totalGoals+' atteints',col:'#a78bfa'},
+        {id:'review',icon:'📝',label:'Review',stat:weekRevs+' review'+(weekRevs!==1?'s':'')+' cette sem.',col:'#fb923c'},
+        {id:'routine',icon:'⏱️',label:'Routine',stat:'Programme du jour',col:'#3b82f6'},
+        {id:'stats',icon:'🏆',label:'Stats',stat:totalBadges+' badge'+(totalBadges!==1?'s':'')+' débloqué'+(totalBadges!==1?'s':''),col:'#fbbf24'},
+      ].map(s=>`<button onclick="go('${s.id}')" style="display:flex;align-items:center;gap:9px;padding:9px 11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;cursor:pointer;text-align:left;width:100%;font-family:'Inter',sans-serif;transition:border-color .2s" onmouseenter="this.style.borderColor='rgba(124,58,237,.35)'" onmouseleave="this.style.borderColor='rgba(255,255,255,.06)'">
+        <span style="font-size:17px;flex-shrink:0">${s.icon}</span>
+        <div style="min-width:0;overflow:hidden">
+          <div style="font-size:12px;font-weight:600;color:#e2e8f0">${s.label}</div>
+          <div style="font-size:10px;color:${s.col};font-weight:600;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.stat}</div>
+        </div>
+      </button>`).join('')}
+    </div>
+  </div>`;
+
+  const _activeGoals=(DATA.goals||[]).filter(g=>!g.completed).slice(0,3);
+  const goalsPreviewCard=_activeGoals.length>0?`<div class="card" style="padding:14px 16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.12em">Objectifs en cours</div>
+      <button onclick="go('goals')" style="font-size:11px;color:#a78bfa;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;padding:0">Voir tout →</button>
+    </div>
+    ${_activeGoals.map(g=>`<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:12px;color:#e2e8f0;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:8px">${CI[g.cat]||''} ${e(g.title)}</span>
+        <span style="font-size:11px;font-weight:700;color:${CC[g.cat]||'#7c3aed'};flex-shrink:0">${g.prog||0}%</span>
+      </div>
+      <div class="bar" style="height:4px"><div style="height:100%;background:${CC[g.cat]||'#7c3aed'};border-radius:99px;width:${g.prog||0}%;transition:width .4s"></div></div>
+      ${g.dl?`<div style="font-size:10px;color:#334155;margin-top:2px">🗓 ${fmtDate(g.dl)}</div>`:''}
+    </div>`).join('')}
+  </div>`:'';
+
   let habitsHTML='';
   cats.forEach(cat=>{
     const ch=H.filter(h=>h.c===cat),cd=ch.filter(h=>dh[h.id]).length;
