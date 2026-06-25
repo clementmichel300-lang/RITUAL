@@ -799,6 +799,8 @@ function pageDash(){
             <div style="font-size:12px;color:#475569;margin-top:3px">${xpToNext.toLocaleString()} XP manquants</div>
           </div>`:''}
           ${overviewCard}
+          ${siteNavCard}
+          ${goalsPreviewCard}
         </div>
       </div>
     </div>`;
@@ -827,6 +829,8 @@ function pageDash(){
     ${perfectCard}${nextCard}
     ${xpPanel(xp,li,streak)}
     ${overviewCard}
+    ${siteNavCard}
+    ${goalsPreviewCard}
     <div class="card" style="padding:0;overflow:hidden">${habitsHTML}</div>
   </div>`;
 }
